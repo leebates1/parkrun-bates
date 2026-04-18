@@ -1,9 +1,9 @@
 name: Build dashboard
 on:
   schedule:
-    # Saturdays at 12:00 UTC (≈13:00 UK summer, 12:00 UK winter) — after parkrun results publish
+    # Saturdays at 12:00 UTC — after parkrun results publish
     - cron: '0 12 * * 6'
-  workflow_dispatch:   # allow manual runs from the Actions tab
+  workflow_dispatch:   # manual trigger from the Actions tab
   push:
     branches: [ main ]
     paths:
@@ -12,12 +12,6 @@ on:
 
 permissions:
   contents: write
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: false
 
 jobs:
   build:
@@ -34,17 +28,9 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add docs/index.html
-          git diff --staged --quiet || git commit -m "chore: weekly dashboard update"
-          git push
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: docs
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+          if ! git diff --staged --quiet; then
+            git commit -m "chore: weekly dashboard update"
+            git push
+          else
+            echo "No changes to commit."
+          fi
