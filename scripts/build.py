@@ -19,8 +19,31 @@ CONFIG = json.loads((ROOT / "scripts" / "runners.json").read_text())
 TEMPLATE = (ROOT / "scripts" / "template.html").read_text()
 OUT = ROOT / "docs" / "index.html"
 
-IMPERSONATE = os.environ.get("CURL_IMPERSONATE", "chrome120")
+_override = os.environ.get("CURL_IMPERSONATE")
+IMPERSONATE_PROFILES = [_override] if _override else [
+    "chrome120",
+    "chrome131",
+    "chrome136",
+    "safari17_0",
+    "firefox133",
+]
 APP_UA = "parkrun/1.2.7 CFNetwork/1121.2.2 Darwin/19.3.0"
+
+
+def _impersonated(method, url, **kwargs):
+    last_err = None
+    for i, profile in enumerate(IMPERSONATE_PROFILES):
+        try:
+            resp = cffi.request(method, url, impersonate=profile, timeout=30, **kwargs)
+            resp.raise_for_status()
+            if i > 0:
+                print(f"  (succeeded with fallback profile {profile})", file=sys.stderr)
+            return resp
+        except RequestException as e:
+            last_err = e
+            if i < len(IMPERSONATE_PROFILES) - 1:
+                print(f"  profile {profile} failed ({e}); trying {IMPERSONATE_PROFILES[i + 1]}", file=sys.stderr)
+    raise last_err
 API_BASE = os.environ.get("PARKRUN_API_BASE", "https://api.parkrun.com").rstrip("/")
 API_CLIENT_ID = os.environ.get("PARKRUN_API_CLIENT_ID", "netdreams-iphone-s01")
 API_CLIENT_SECRET = os.environ.get(
@@ -30,26 +53,19 @@ API_CLIENT_SECRET = os.environ.get(
 
 
 def fetch(url):
-    resp = cffi.get(
-        url,
-        headers={
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            "Accept-Language": "en-GB,en;q=0.9",
-        },
-        impersonate=IMPERSONATE,
-        timeout=30,
-    )
-    resp.raise_for_status()
+    resp = _impersonated("GET", url, headers={
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "en-GB,en;q=0.9",
+    })
     return resp.text
 
 
 def fetch_json(url, *, headers=None, data=None):
+    method = "POST" if data is not None else "GET"
+    kwargs = {"headers": headers or {}}
     if data is not None:
-        resp = cffi.post(url, headers=headers or {}, data=data, impersonate=IMPERSONATE, timeout=30)
-    else:
-        resp = cffi.get(url, headers=headers or {}, impersonate=IMPERSONATE, timeout=30)
-    resp.raise_for_status()
-    return resp.json()
+        kwargs["data"] = data
+    return _impersonated(method, url, **kwargs).json()
 
 
 def load_previous_payload():
