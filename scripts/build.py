@@ -10,15 +10,16 @@ import time
 from datetime import date, datetime, timezone
 from pathlib import Path
 from urllib.parse import urlencode
-from urllib.request import Request, urlopen
-from urllib.error import HTTPError, URLError
+
+from curl_cffi import requests as cffi
+from curl_cffi.requests.exceptions import RequestException
 
 ROOT = Path(__file__).resolve().parent.parent
 CONFIG = json.loads((ROOT / "scripts" / "runners.json").read_text())
 TEMPLATE = (ROOT / "scripts" / "template.html").read_text()
 OUT = ROOT / "docs" / "index.html"
 
-UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+IMPERSONATE = os.environ.get("CURL_IMPERSONATE", "chrome120")
 APP_UA = "parkrun/1.2.7 CFNetwork/1121.2.2 Darwin/19.3.0"
 API_BASE = os.environ.get("PARKRUN_API_BASE", "https://api.parkrun.com").rstrip("/")
 API_CLIENT_ID = os.environ.get("PARKRUN_API_CLIENT_ID", "netdreams-iphone-s01")
@@ -29,22 +30,26 @@ API_CLIENT_SECRET = os.environ.get(
 
 
 def fetch(url):
-    req = Request(
+    resp = cffi.get(
         url,
         headers={
-            "User-Agent": UA,
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
             "Accept-Language": "en-GB,en;q=0.9",
         },
+        impersonate=IMPERSONATE,
+        timeout=30,
     )
-    with urlopen(req, timeout=30) as resp:
-        return resp.read().decode("utf-8")
+    resp.raise_for_status()
+    return resp.text
 
 
 def fetch_json(url, *, headers=None, data=None):
-    req = Request(url, headers=headers or {}, data=data)
-    with urlopen(req, timeout=30) as resp:
-        return json.loads(resp.read().decode("utf-8"))
+    if data is not None:
+        resp = cffi.post(url, headers=headers or {}, data=data, impersonate=IMPERSONATE, timeout=30)
+    else:
+        resp = cffi.get(url, headers=headers or {}, impersonate=IMPERSONATE, timeout=30)
+    resp.raise_for_status()
+    return resp.json()
 
 
 def load_previous_payload():
@@ -307,7 +312,7 @@ def main():
     try:
         runners = fetch_api_runners(previous_runners)
         live_data = bool(runners)
-    except (HTTPError, URLError, TimeoutError, KeyError, ValueError, json.JSONDecodeError) as e:
+    except (RequestException, KeyError, ValueError, json.JSONDecodeError) as e:
         print(f"App API failed: {e}", file=sys.stderr)
         runners = []
 
@@ -317,7 +322,7 @@ def main():
             print(f"Fetching {r['name']}: {url}", file=sys.stderr)
             try:
                 html = fetch(url)
-            except (HTTPError, URLError, TimeoutError) as e:
+            except RequestException as e:
                 print(f"  ERROR: {e}", file=sys.stderr)
                 cached = previous_runners.get(str(r["id"]))
                 if not cached:
