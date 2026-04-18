@@ -1,0 +1,13 @@
+{
+  "name": "BATES family parkrun",
+  "short_name": "BATES parkrun",
+  "description": "Interactive parkrun dashboard for Lee & Sally Bates",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#2b233d",
+  "theme_color": "#2b233d",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
