@@ -107,9 +107,239 @@ PAYLOAD.runners.forEach((r, i) => {
   b.onclick = () => { activeRunner = i; [...swEl.children].forEach((x,j) => x.classList.toggle('active', j===i)); render(); };
   swEl.appendChild(b);
 });
+if (PAYLOAD.runners.length >= 2) {
+  const vs = document.createElement('button');
+  vs.textContent = '⚡ Head-to-head';
+  vs.onclick = () => { activeRunner = 'vs'; [...swEl.children].forEach(x => x.classList.remove('active')); vs.classList.add('active'); renderH2H(); };
+  swEl.appendChild(vs);
+}
 
 let chartInstances = [];
 function destroyCharts() { chartInstances.forEach(c => c.destroy()); chartInstances = []; }
+
+const COLORS = ['#2b233d', '#ff4d6d', '#00b6c4', '#ffa300'];
+
+function prep(runner) {
+  return runner.results
+    .map(r => ({...r, d: parseDate(r.date), seconds: toSeconds(r.time)}))
+    .sort((a,b) => a.d - b.d);
+}
+
+function renderH2H() {
+  destroyCharts();
+  const runners = PAYLOAD.runners.map(r => ({...r, data: prep(r)}));
+
+  const stats = runners.map(r => {
+    const d = r.data;
+    if (!d.length) return null;
+    const pb = d.reduce((a,b) => b.seconds < a.seconds ? b : a);
+    const avg = d.reduce((s,x) => s+x.seconds, 0) / d.length;
+    const bestAG = d.reduce((a,b) => b.ageGrade > a.ageGrade ? b : a);
+    const avgAG = d.reduce((s,x) => s+x.ageGrade, 0) / d.length;
+    const bestPos = d.reduce((a,b) => b.pos < a.pos ? b : a);
+    const pbs = d.filter(x => x.pb).length;
+    return { ...r, pb, avg, bestAG, avgAG, bestPos, pbs };
+  }).filter(Boolean);
+
+  // Shared race days (same date on same course)
+  const byDate = {};
+  runners.forEach((r, i) => r.data.forEach(x => {
+    if (!byDate[x.date]) byDate[x.date] = {};
+    byDate[x.date][i] = x;
+  }));
+  const sharedDays = Object.entries(byDate)
+    .filter(([_, m]) => Object.keys(m).length === runners.length)
+    .map(([date, m]) => ({ date, runs: runners.map((_, i) => m[i]), d: parseDate(date) }))
+    .sort((a,b) => a.d - b.d);
+
+  // Head-to-head wins (assuming 2 runners)
+  let wins = [0, 0], closest = null, biggest = null;
+  sharedDays.forEach(day => {
+    const [a, b] = day.runs;
+    if (a.seconds < b.seconds) wins[0]++;
+    else if (b.seconds < a.seconds) wins[1]++;
+    const gap = Math.abs(a.seconds - b.seconds);
+    if (!closest || gap < closest.gap) closest = { ...day, gap };
+    if (!biggest || gap > biggest.gap) biggest = { ...day, gap };
+  });
+
+  document.getElementById('headerName').textContent = runners.map(r => r.short).join('  vs  ');
+  document.getElementById('headerMeta').textContent =
+    `${sharedDays.length} parkruns run together · ${wins[0]} wins for ${runners[0].short}, ${wins[1]} for ${runners[1].short}`;
+
+  const app = document.getElementById('app');
+
+  // KPI comparison grid
+  function cmpRow(label, vals, fmt, better='lower') {
+    const nums = vals.map(v => typeof v === 'number' ? v : (v && v.seconds != null ? v.seconds : (v && v.ageGrade != null ? v.ageGrade : (v && v.pos != null ? v.pos : v))));
+    const winner = nums.reduce((bi, n, i) => {
+      if (better === 'lower') return n < nums[bi] ? i : bi;
+      return n > nums[bi] ? i : bi;
+    }, 0);
+    return `<tr>
+      <td style="color:var(--ink2); font-size:11px; text-transform:uppercase; letter-spacing:.5px;">${label}</td>
+      ${vals.map((v,i) => `<td style="font-weight:${i===winner?'700':'500'}; color:${i===winner?'var(--pb)':'var(--ink)'}; font-variant-numeric:tabular-nums;">
+        ${fmt(v)}${i===winner?' 🏆':''}
+      </td>`).join('')}
+    </tr>`;
+  }
+
+  app.innerHTML = `
+    <div class="card" style="margin-bottom:14px;">
+      <h2>Head-to-head stats</h2>
+      <table style="width:100%; font-size:14px;">
+        <thead><tr>
+          <th></th>
+          ${stats.map((s,i) => `<th style="color:${COLORS[i]}; text-align:left;">${s.short}</th>`).join('')}
+        </tr></thead>
+        <tbody>
+          ${cmpRow('Total runs', stats.map(s => s.totalRuns), v => v)}
+          ${cmpRow('Widnes runs', stats.map(s => s.homeRuns), v => v)}
+          ${cmpRow('Personal best', stats.map(s => s.pb), v => fmtTime(v.seconds) + ' (' + v.date + ')')}
+          ${cmpRow('Average time', stats.map(s => s.avg), v => fmtTime(v))}
+          ${cmpRow('Best age grade', stats.map(s => s.bestAG), v => v.ageGrade.toFixed(2) + '%', 'higher')}
+          ${cmpRow('Avg age grade', stats.map(s => s.avgAG), v => v.toFixed(2) + '%', 'higher')}
+          ${cmpRow('Best finish position', stats.map(s => s.bestPos), v => '#' + v.pos)}
+          ${cmpRow('PBs set', stats.map(s => s.pbs), v => v, 'higher')}
+        </tbody>
+      </table>
+    </div>
+
+    ${sharedDays.length ? `
+    <div class="card" style="background:linear-gradient(135deg,#2b233d,#4f3d80); color:white; margin-bottom:14px;">
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px;">
+        <div>
+          <div style="font-size:11px; opacity:.7; text-transform:uppercase; letter-spacing:.5px;">Wins</div>
+          <div style="font-size:22px; font-weight:700;">
+            <span style="color:${COLORS[0]==='#2b233d'?'#ffa300':COLORS[0]}">${runners[0].short} ${wins[0]}</span>
+            <span style="opacity:.5;"> — </span>
+            <span style="color:${COLORS[1]}">${wins[1]} ${runners[1].short}</span>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px; opacity:.7; text-transform:uppercase; letter-spacing:.5px;">Closest finish</div>
+          <div style="font-size:15px; font-weight:600;">${closest ? closest.gap + 's on ' + closest.date : '—'}</div>
+          <div style="font-size:12px; opacity:.75;">${closest ? closest.runs.map((r,i) => runners[i].short + ' ' + r.time).join(' vs ') : ''}</div>
+        </div>
+        <div>
+          <div style="font-size:11px; opacity:.7; text-transform:uppercase; letter-spacing:.5px;">Biggest gap</div>
+          <div style="font-size:15px; font-weight:600;">${biggest ? fmtTime(biggest.gap) + ' on ' + biggest.date : '—'}</div>
+          <div style="font-size:12px; opacity:.75;">${biggest ? biggest.runs.map((r,i) => runners[i].short + ' ' + r.time).join(' vs ') : ''}</div>
+        </div>
+      </div>
+    </div>` : ''}
+
+    <div class="card" style="margin-bottom:14px;">
+      <h2>Finish time — both runners</h2>
+      <div class="chart-wrap tall"><canvas id="h2hTime"></canvas></div>
+    </div>
+
+    <div class="grid">
+      <div class="card"><h2>PB progression — both runners</h2><div class="chart-wrap"><canvas id="h2hPB"></canvas></div></div>
+      <div class="card"><h2>Same-day comparison</h2><div class="chart-wrap"><canvas id="h2hScatter"></canvas></div>
+        <div style="font-size:11px; color:var(--ink2); margin-top:6px;">Each point is a parkrun both ran. Below the line = ${runners[0].short} was faster; above = ${runners[1].short} was faster.</div>
+      </div>
+    </div>
+
+    ${sharedDays.length ? `
+    <div class="card"><h2>Same-day results (${sharedDays.length})</h2>
+      <div class="scroll">
+        <table>
+          <thead><tr>
+            <th>Date</th>
+            ${runners.map(r => `<th>${r.short}</th>`).join('')}
+            <th>Gap</th>
+            <th>Winner</th>
+          </tr></thead>
+          <tbody>
+            ${[...sharedDays].reverse().map(day => {
+              const [a, b] = day.runs;
+              const gap = Math.abs(a.seconds - b.seconds);
+              const winnerIdx = a.seconds < b.seconds ? 0 : 1;
+              return `<tr>
+                <td>${day.date}</td>
+                ${day.runs.map((r,i) => `<td style="font-weight:${i===winnerIdx?'700':'400'};">${r.time}${r.pb?' <span class="pb-flag">PB</span>':''}</td>`).join('')}
+                <td style="font-variant-numeric:tabular-nums;">${fmtTime(gap)}</td>
+                <td style="color:${COLORS[winnerIdx]}; font-weight:700;">${runners[winnerIdx].short}</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>` : ''}
+  `;
+
+  // Time chart — both runners overlaid
+  chartInstances.push(new Chart(document.getElementById('h2hTime'), {
+    type: 'line',
+    data: { datasets: runners.map((r, i) => ({
+      label: r.short,
+      data: r.data.map(x => ({x: x.d, y: x.seconds, date: x.date, time: x.time, pb: x.pb, ag: x.ageGrade})),
+      borderColor: COLORS[i],
+      backgroundColor: ctx => ctx.raw && ctx.raw.pb ? '#ff4d6d' : COLORS[i],
+      pointRadius: ctx => ctx.raw && ctx.raw.pb ? 6 : 2.5,
+      pointHoverRadius: 7,
+      borderWidth: 1.5,
+      tension: 0.15,
+    })) },
+    options: { maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom' },
+        tooltip: { callbacks: { label: c => {
+          const r = c.raw;
+          return c.dataset.label + ' — ' + r.date + '  ' + r.time + (r.pb?' (PB)':'') + '  ·  AG ' + r.ag + '%';
+        } } } },
+      scales: {
+        x: { type: 'time', time: { unit: 'month' }, grid: { color: '#eee' } },
+        y: { reverse: true, ticks: { callback: v => fmtTime(v) }, grid: { color: '#eee' } }
+      }
+    }
+  }));
+
+  // PB progression for both
+  const pbDatasets = runners.map((r, i) => {
+    const prog = [];
+    let best = Infinity;
+    r.data.forEach(x => { if (x.seconds < best) { best = x.seconds; prog.push(x); } });
+    return {
+      label: r.short,
+      data: prog.map(x => ({x: x.d, y: x.seconds, date: x.date, time: x.time})),
+      borderColor: COLORS[i],
+      backgroundColor: COLORS[i],
+      pointRadius: 5, pointHoverRadius: 7, stepped: 'after', borderWidth: 2,
+    };
+  });
+  chartInstances.push(new Chart(document.getElementById('h2hPB'), {
+    type: 'line',
+    data: { datasets: pbDatasets },
+    options: { maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom' },
+        tooltip: { callbacks: { label: c => c.dataset.label + ' — ' + c.raw.date + ': ' + c.raw.time } } },
+      scales: { x: { type: 'time', time: { unit: 'month' }, grid: { color: '#eee' } },
+                y: { reverse: true, ticks: { callback: v => fmtTime(v) }, grid: { color: '#eee' } } }
+    }
+  }));
+
+  // Scatter: Lee's time vs Sally's time
+  const maxT = Math.max(...sharedDays.flatMap(d => d.runs.map(r => r.seconds))) + 60;
+  const minT = Math.min(...sharedDays.flatMap(d => d.runs.map(r => r.seconds))) - 60;
+  chartInstances.push(new Chart(document.getElementById('h2hScatter'), {
+    type: 'scatter',
+    data: { datasets: [
+      { label: 'Shared run', data: sharedDays.map(d => ({x: d.runs[0].seconds, y: d.runs[1].seconds, date: d.date, a: d.runs[0].time, b: d.runs[1].time})),
+        backgroundColor: '#ffa300', pointRadius: 5, pointHoverRadius: 7 },
+      { label: 'Equal line', type: 'line', data: [{x:minT,y:minT},{x:maxT,y:maxT}],
+        borderColor: '#ccc', borderDash: [4,4], borderWidth: 1, pointRadius: 0, fill: false }
+    ]},
+    options: { maintainAspectRatio: false,
+      plugins: { legend: { display: false },
+        tooltip: { callbacks: { label: c => c.raw.date ? [c.raw.date, runners[0].short + ': ' + c.raw.a, runners[1].short + ': ' + c.raw.b] : '' } } },
+      scales: {
+        x: { min: minT, max: maxT, ticks: { callback: v => fmtTime(v) }, title: { display: true, text: runners[0].short + '\'s time' }, grid: { color: '#eee' } },
+        y: { min: minT, max: maxT, ticks: { callback: v => fmtTime(v) }, title: { display: true, text: runners[1].short + '\'s time' }, grid: { color: '#eee' } }
+      }
+    }
+  }));
+}
 
 function render() {
   destroyCharts();
