@@ -1,0 +1,8 @@
+{
+  "event": "widnes",
+  "event_coords": {"lat": 53.3745, "lon": -2.7301},
+  "runners": [
+    {"id": "7959573", "name": "Lee BATES", "short": "Lee"},
+    {"id": "7939292", "name": "Sally BATES", "short": "Sally"}
+  ]
+}

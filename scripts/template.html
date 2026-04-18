@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#2b233d">
+<title>BATES family parkrun dashboard</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🏃%3C/text%3E%3C/svg%3E">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+<style>
+  :root {
+    --pr-purple: #2b233d; --pr-purple2: #3d3155;
+    --accent: #ffa300; --accent2: #00b6c4; --pb: #ff4d6d;
+    --bg: #f5f3fb; --card: #ffffff; --ink: #1b1730; --ink2: #5c5773; --line: #e6e1ef;
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.5; }
+  header { background:linear-gradient(135deg,var(--pr-purple),var(--pr-purple2)); color:white; padding:24px 20px; box-shadow:0 2px 10px rgba(0,0,0,.12); }
+  header h1 { margin:0 0 4px; font-size:22px; font-weight:700; }
+  header .meta { opacity:.85; font-size:13px; }
+  .badge { display:inline-block; background:var(--accent); color:var(--pr-purple); padding:2px 9px; border-radius:999px; font-weight:700; font-size:11px; margin-left:6px; vertical-align:middle; }
+  .runner-switcher { display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; }
+  .runner-switcher button { background:rgba(255,255,255,.1); color:white; border:1px solid rgba(255,255,255,.25); padding:8px 16px; border-radius:999px; cursor:pointer; font-size:13px; font-weight:600; }
+  .runner-switcher button.active { background:white; color:var(--pr-purple); border-color:white; }
+  main { max-width:1200px; margin:0 auto; padding:16px; }
+  .kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; margin-bottom:16px; }
+  .kpi { background:var(--card); border-radius:12px; padding:14px; box-shadow:0 1px 3px rgba(30,20,60,.08); border-top:3px solid var(--accent); }
+  .kpi .label { font-size:11px; color:var(--ink2); text-transform:uppercase; letter-spacing:.5px; }
+  .kpi .val { font-size:22px; font-weight:700; margin-top:4px; }
+  .kpi .sub { font-size:11px; color:var(--ink2); margin-top:2px; }
+  .kpi.pb { border-top-color:var(--pb); }
+  .kpi.accent2 { border-top-color:var(--accent2); }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
+  @media (max-width:820px) { .grid { grid-template-columns:1fr; } }
+  .card { background:var(--card); border-radius:12px; padding:14px; box-shadow:0 1px 3px rgba(30,20,60,.08); }
+  .card h2 { margin:0 0 10px; font-size:15px; color:var(--pr-purple); }
+  .chart-wrap { position:relative; height:260px; }
+  .chart-wrap.tall { height:320px; }
+  .controls { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
+  .btn { background:var(--bg); border:1px solid var(--line); padding:5px 10px; border-radius:999px; cursor:pointer; font-size:11px; color:var(--ink2); font-weight:600; }
+  .btn.active { background:var(--pr-purple); color:white; border-color:var(--pr-purple); }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th,td { padding:7px 10px; text-align:left; border-bottom:1px solid var(--line); }
+  th { background:var(--bg); font-weight:600; color:var(--ink2); cursor:pointer; user-select:none; font-size:12px; }
+  th:hover { color:var(--pr-purple); }
+  tbody tr:hover { background:#faf8ff; }
+  .pb-flag { background:var(--pb); color:white; padding:1px 7px; border-radius:4px; font-size:10px; font-weight:700; }
+  .scroll { max-height:380px; overflow-y:auto; }
+  footer { text-align:center; color:var(--ink2); font-size:11px; padding:18px; }
+  footer a { color:var(--pr-purple); }
+</style>
+</head>
+<body>
+<header>
+  <h1 id="headerName">Loading…</h1>
+  <div class="meta" id="headerMeta"></div>
+  <div class="runner-switcher" id="switcher"></div>
+</header>
+
+<main id="app"></main>
+
+<footer>
+  Auto-generated from <a href="https://www.parkrun.org.uk/widnes/">Widnes parkrun</a> results &middot;
+  <span id="generatedAt"></span> &middot;
+  <a href="https://github.com/leebates1/parkrun-bates">source</a>
+</footer>
+
+<script>
+const PAYLOAD = __DATA__;
+let activeRunner = 0;
+
+Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+Chart.defaults.color = '#5c5773';
+
+document.getElementById('generatedAt').textContent =
+  'updated ' + new Date(PAYLOAD.generatedAt).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' });
+
+// helpers
+function parseDate(d) { const [dd,mm,yy] = d.split('/'); return new Date(+yy, +mm-1, +dd); }
+function toSeconds(t) { const p = t.split(':').map(Number); return p.length===3 ? p[0]*3600+p[1]*60+p[2] : p[0]*60+p[1]; }
+function fmtTime(s) { const m = Math.floor(s/60), sec = Math.round(s%60); return m + ':' + String(sec).padStart(2,'0'); }
+function fmtLong(s) { const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = Math.round(s%60); return (h ? h+':' + String(m).padStart(2,'0') : m) + ':' + String(sec).padStart(2,'0'); }
+function pearson(xs, ys) {
+  const n = xs.length; if (n < 2) return 0;
+  const mx = xs.reduce((a,b)=>a+b,0)/n, my = ys.reduce((a,b)=>a+b,0)/n;
+  let num=0,dx2=0,dy2=0;
+  for (let i=0;i<n;i++){ const dx=xs[i]-mx, dy=ys[i]-my; num+=dx*dy; dx2+=dx*dx; dy2+=dy*dy; }
+  return dx2 && dy2 ? num/Math.sqrt(dx2*dy2) : 0;
+}
+
+// switcher buttons
+const swEl = document.getElementById('switcher');
+PAYLOAD.runners.forEach((r, i) => {
+  const b = document.createElement('button');
+  b.textContent = r.short;
+  b.className = i === 0 ? 'active' : '';
+  b.onclick = () => { activeRunner = i; [...swEl.children].forEach((x,j) => x.classList.toggle('active', j===i)); render(); };
+  swEl.appendChild(b);
+});
+
+let chartInstances = [];
+function destroyCharts() { chartInstances.forEach(c => c.destroy()); chartInstances = []; }
+
+function render() {
+  destroyCharts();
+  const runner = PAYLOAD.runners[activeRunner];
+  const raw = runner.results;
+  if (!raw.length) {
+    document.getElementById('app').innerHTML = '<div class="card">No results yet.</div>';
+    return;
+  }
+  const data = raw.map(r => ({...r, d: parseDate(r.date), seconds: toSeconds(r.time)})).sort((a,b)=>a.d-b.d);
+
+  // headline
+  let clubBadge = '';
+  if (runner.club500) clubBadge = '<span class="badge" style="background:#000; color:white;">500 Club</span>';
+  else if (runner.club250) clubBadge = '<span class="badge" style="background:#1c8a3c; color:white;">250 Club</span>';
+  else if (runner.club100) clubBadge = '<span class="badge" style="background:#ff4d6d; color:white;">100 Club</span>';
+  document.getElementById('headerName').innerHTML = runner.name + ' ' + clubBadge;
+  document.getElementById('headerMeta').textContent =
+    `parkrunner A${runner.id} · ${runner.totalRuns} parkruns total · ${runner.homeRuns} at ${runner.homeEvent}` +
+    (runner.ageCat ? ` · age category ${runner.ageCat}` : '');
+
+  // stats
+  const pb = data.reduce((a,b) => b.seconds < a.seconds ? b : a);
+  const avgSec = data.reduce((s,r)=>s+r.seconds,0) / data.length;
+  const bestAG = data.reduce((a,b) => b.ageGrade > a.ageGrade ? b : a);
+  const avgAG = data.reduce((s,r)=>s+r.ageGrade,0) / data.length;
+  const bestPos = data.reduce((a,b) => b.pos < a.pos ? b : a);
+  const avgPos = data.reduce((s,r)=>s+r.pos,0) / data.length;
+  const pbs = data.filter(r => r.pb);
+
+  // streaks
+  let longestStreak = 1, currentStreak = 1, streakStart = data[0], bestStart = data[0], bestEnd = data[0];
+  for (let i=1; i<data.length; i++) {
+    const gap = (data[i].d - data[i-1].d) / 86400000;
+    if (gap <= 8) { currentStreak++; if (currentStreak > longestStreak) { longestStreak = currentStreak; bestStart = streakStart; bestEnd = data[i]; } }
+    else { currentStreak = 1; streakStart = data[i]; }
+  }
+  let longestGap = 0, gapStart=data[0], gapEnd=data[0];
+  for (let i=1; i<data.length; i++) {
+    const gap = (data[i].d - data[i-1].d) / 86400000;
+    if (gap > longestGap) { longestGap = gap; gapStart = data[i-1]; gapEnd = data[i]; }
+  }
+  let biggestDrop = 0, dropFrom=data[0], dropTo=data[0];
+  for (let i=1; i<data.length; i++) {
+    const drop = data[i-1].seconds - data[i].seconds;
+    if (drop > biggestDrop) { biggestDrop = drop; dropFrom = data[i-1]; dropTo = data[i]; }
+  }
+  const last20 = data.slice(-20);
+  const mean20 = last20.reduce((s,r)=>s+r.seconds,0) / last20.length;
+  const sd20 = Math.sqrt(last20.reduce((s,r)=>s+(r.seconds-mean20)**2,0) / last20.length);
+
+  const milestones = [
+    { label: 'First sub-40', run: data.find(r => r.seconds < 40*60) },
+    { label: 'First sub-35', run: data.find(r => r.seconds < 35*60) },
+    { label: 'First sub-30', run: data.find(r => r.seconds < 30*60) },
+    { label: 'First sub-25', run: data.find(r => r.seconds < 25*60) },
+  ].filter(m => m.run);
+
+  // DOM
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="kpis">
+      <div class="kpi pb"><div class="label">Personal Best</div><div class="val">${fmtTime(pb.seconds)}</div><div class="sub">${pb.date}</div></div>
+      <div class="kpi"><div class="label">Average</div><div class="val">${fmtTime(avgSec)}</div><div class="sub">over ${data.length} runs</div></div>
+      <div class="kpi accent2"><div class="label">Best age grade</div><div class="val">${bestAG.ageGrade.toFixed(2)}%</div><div class="sub">avg ${avgAG.toFixed(1)}%</div></div>
+      <div class="kpi"><div class="label">Best finish</div><div class="val">${bestPos.pos}</div><div class="sub">avg ${avgPos.toFixed(0)}</div></div>
+      <div class="kpi pb"><div class="label">PBs set</div><div class="val">${pbs.length}</div><div class="sub">latest ${pbs.length ? pbs[pbs.length-1].date : '—'}</div></div>
+      <div class="kpi"><div class="label">Distance</div><div class="val">${(data.length*5).toLocaleString()} km</div><div class="sub">${data.length} × 5k</div></div>
+    </div>
+
+    <div class="grid"><div class="card" style="grid-column:1/-1;">
+      <h2>Finish time over time</h2>
+      <div class="controls">
+        <button class="btn active" data-range="all">All</button>
+        <button class="btn" data-range="2y">2 yrs</button>
+        <button class="btn" data-range="1y">12 mo</button>
+      </div>
+      <div class="chart-wrap tall"><canvas id="timeChart"></canvas></div>
+    </div></div>
+
+    <div class="grid">
+      <div class="card"><h2>Best annual time</h2><div class="chart-wrap"><canvas id="yearChart"></canvas></div></div>
+      <div class="card"><h2>Age grade trend</h2><div class="chart-wrap"><canvas id="ageGradeChart"></canvas></div></div>
+    </div>
+
+    <div class="grid">
+      <div class="card"><h2>PB progression</h2><div class="chart-wrap"><canvas id="pbChart"></canvas></div></div>
+      <div class="card"><h2>Milestones &amp; streaks</h2><div id="milestones"></div></div>
+    </div>
+
+    <div class="grid">
+      <div class="card"><h2>Runs per month</h2><div class="chart-wrap"><canvas id="monthChart"></canvas></div></div>
+      <div class="card"><h2>Finish time distribution</h2><div class="chart-wrap"><canvas id="histChart"></canvas></div></div>
+    </div>
+
+    <div class="grid">
+      <div class="card"><h2>Equivalent race times <span style="font-size:10px; color:var(--ink2); font-weight:normal;">(Riegel from 5k PB)</span></h2><div id="raceTimes"></div></div>
+      <div class="card"><h2>Next milestones</h2><div id="nextMilestones"></div></div>
+    </div>
+
+    <div class="card" style="margin-bottom:14px;"><h2>Activity heatmap (last 2 yrs)</h2><div id="heatmap" style="overflow-x:auto;"></div></div>
+
+    <div class="grid">
+      <div class="card">
+        <h2>Weather vs finish time</h2>
+        <div class="chart-wrap"><canvas id="weatherChart"></canvas></div>
+        <div id="weatherInsight" style="font-size:11px; color:var(--ink2); margin-top:6px;"></div>
+      </div>
+      <div class="card"><h2>Weather extremes</h2><div id="weatherExtremes"></div></div>
+    </div>
+
+    <div class="card">
+      <h2>All runs</h2>
+      <div class="scroll">
+        <table id="runTable">
+          <thead><tr>
+            <th data-sort="date">Date</th>
+            <th data-sort="run">Run #</th>
+            <th data-sort="pos">Pos</th>
+            <th data-sort="seconds">Time</th>
+            <th data-sort="ageGrade">AG</th>
+            <th>PB</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  `;
+
+  // Time chart
+  let timeChart;
+  function drawTime(range) {
+    const now = data[data.length-1].d;
+    let filtered = data;
+    if (range === '2y') filtered = data.filter(r => (now - r.d)/86400000 <= 730);
+    if (range === '1y') filtered = data.filter(r => (now - r.d)/86400000 <= 365);
+    const pts = filtered.map(r => ({x:r.d, y:r.seconds, pb:r.pb, date:r.date, time:r.time, ag:r.ageGrade, pos:r.pos}));
+    let best = Infinity;
+    const bestLine = filtered.map(r => { best = Math.min(best, r.seconds); return {x:r.d, y:best}; });
+    if (timeChart) { timeChart.destroy(); chartInstances = chartInstances.filter(c => c !== timeChart); }
+    timeChart = new Chart(document.getElementById('timeChart'), {
+      type: 'line',
+      data: { datasets: [
+        { label: 'Time', data: pts, borderColor: '#2b233d',
+          backgroundColor: ctx => ctx.raw && ctx.raw.pb ? '#ff4d6d' : '#ffa300',
+          pointRadius: ctx => ctx.raw && ctx.raw.pb ? 6 : 3, pointHoverRadius: 7, borderWidth: 1.5, tension: 0.15 },
+        { label: 'Running PB', data: bestLine, borderColor: '#ff4d6d', borderDash: [6,4], borderWidth: 2, pointRadius: 0, fill: false, stepped: 'after' }
+      ]},
+      options: { maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom' },
+          tooltip: { callbacks: { label: c => {
+            const r = c.raw;
+            if (!r.time) return 'PB line: ' + fmtTime(r.y);
+            return [r.date, 'Time: ' + r.time + (r.pb?'  (PB)':''), 'Age grade: ' + r.ag + '%', 'Position: ' + r.pos];
+          } } } },
+        scales: {
+          x: { type: 'time', time: { unit: 'month' }, grid: { color: '#eee' } },
+          y: { reverse: true, ticks: { callback: v => fmtTime(v) }, grid: { color: '#eee' } }
+        }
+      }
+    });
+    chartInstances.push(timeChart);
+  }
+  drawTime('all');
+  document.querySelectorAll('.btn[data-range]').forEach(b => b.onclick = () => {
+    document.querySelectorAll('.btn[data-range]').forEach(x => x.classList.remove('active'));
+    b.classList.add('active'); drawTime(b.dataset.range);
+  });
+
+  // Year chart
+  const byYear = {};
+  data.forEach(r => { const y = r.d.getFullYear(); if (!byYear[y] || r.seconds < byYear[y].seconds) byYear[y] = r; });
+  const years = Object.keys(byYear).sort();
+  chartInstances.push(new Chart(document.getElementById('yearChart'), {
+    type: 'bar',
+    data: { labels: years, datasets: [{ label: 'Best time', data: years.map(y => byYear[y].seconds),
+      backgroundColor: ['#9c89c4','#7460a3','#4f3d80','#2b233d','#00b6c4','#ffa300','#ff4d6d'], borderRadius: 6 }] },
+    options: { maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => fmtTime(c.raw) + '  (' + byYear[c.label].date + ')' } } },
+      scales: { y: { ticks: { callback: v => fmtTime(v) }, grid: { color: '#eee' } } }
+    }
+  }));
+
+  // Age grade
+  chartInstances.push(new Chart(document.getElementById('ageGradeChart'), {
+    type: 'line',
+    data: { datasets: [{ label: 'Age grade %', data: data.map(r => ({x:r.d, y:r.ageGrade})),
+      borderColor: '#00b6c4', backgroundColor: 'rgba(0,182,196,.15)', fill: true, pointRadius: 2, tension: 0.25 }] },
+    options: { maintainAspectRatio: false, plugins: { legend: { display: false } },
+      scales: { x: { type: 'time', time: { unit: 'month' }, grid: { color: '#eee' } },
+                y: { ticks: { callback: v => v + '%' }, grid: { color: '#eee' } } }
+    }
+  }));
+
+  // PB progression
+  const pbProg = [];
+  let bestSoFar = Infinity;
+  data.forEach(r => { if (r.seconds < bestSoFar) { bestSoFar = r.seconds; pbProg.push(r); } });
+  chartInstances.push(new Chart(document.getElementById('pbChart'), {
+    type: 'line',
+    data: { datasets: [{ label: 'PB', data: pbProg.map(r => ({x:r.d, y:r.seconds, date:r.date, time:r.time})),
+      borderColor: '#ff4d6d', backgroundColor: '#ff4d6d', pointRadius: 6, pointHoverRadius: 8, stepped: 'after', borderWidth: 2 }] },
+    options: { maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => c.raw.date + ' → ' + c.raw.time } } },
+      scales: { x: { type: 'time', time: { unit: 'month' }, grid: { color: '#eee' } },
+                y: { reverse: true, ticks: { callback: v => fmtTime(v) }, grid: { color: '#eee' } } }
+    }
+  }));
+
+  // Milestones
+  document.getElementById('milestones').innerHTML = `
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:12px;">
+      ${milestones.map(m => `<div style="background:var(--bg); padding:9px; border-radius:8px;">
+        <div style="color:var(--ink2); font-size:10px; text-transform:uppercase; letter-spacing:.5px;">${m.label}</div>
+        <div style="font-weight:700; margin-top:2px;">${m.run.time}</div>
+        <div style="font-size:11px; color:var(--ink2);">${m.run.date}</div>
+      </div>`).join('')}
+      <div style="background:var(--bg); padding:9px; border-radius:8px;">
+        <div style="color:var(--ink2); font-size:10px; text-transform:uppercase; letter-spacing:.5px;">Longest streak</div>
+        <div style="font-weight:700; margin-top:2px;">${longestStreak} weeks</div>
+        <div style="font-size:11px; color:var(--ink2);">${bestStart.date} → ${bestEnd.date}</div>
+      </div>
+      <div style="background:var(--bg); padding:9px; border-radius:8px;">
+        <div style="color:var(--ink2); font-size:10px; text-transform:uppercase; letter-spacing:.5px;">Biggest improvement</div>
+        <div style="font-weight:700; margin-top:2px;">${fmtTime(biggestDrop)} faster</div>
+        <div style="font-size:11px; color:var(--ink2);">${dropFrom.time} → ${dropTo.time}</div>
+      </div>
+      <div style="background:var(--bg); padding:9px; border-radius:8px;">
+        <div style="color:var(--ink2); font-size:10px; text-transform:uppercase; letter-spacing:.5px;">Longest gap</div>
+        <div style="font-weight:700; margin-top:2px;">${Math.round(longestGap)} days</div>
+      </div>
+      <div style="background:var(--bg); padding:9px; border-radius:8px;">
+        <div style="color:var(--ink2); font-size:10px; text-transform:uppercase; letter-spacing:.5px;">Consistency (last 20)</div>
+        <div style="font-weight:700; margin-top:2px;">±${fmtTime(sd20)}</div>
+        <div style="font-size:11px; color:var(--ink2);">std dev from ${fmtTime(mean20)}</div>
+      </div>
+    </div>`;
+
+  // Month activity
+  const byMonth = {};
+  data.forEach(r => { const k = r.d.getFullYear() + '-' + String(r.d.getMonth()+1).padStart(2,'0'); byMonth[k] = (byMonth[k]||0)+1; });
+  const mKeys = Object.keys(byMonth).sort();
+  chartInstances.push(new Chart(document.getElementById('monthChart'), {
+    type: 'bar',
+    data: { labels: mKeys, datasets: [{ label: 'Runs', data: mKeys.map(k => byMonth[k]), backgroundColor: '#ffa300', borderRadius: 3 }] },
+    options: { maintainAspectRatio: false, plugins: { legend: { display: false } },
+      scales: { x: { ticks: { maxRotation: 90, minRotation: 60, font: { size: 9 } }, grid: { display: false } },
+                y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#eee' } } }
+    }
+  }));
+
+  // Histogram
+  const bins = {};
+  data.forEach(r => { const b = Math.floor(r.seconds/60)*60; bins[b] = (bins[b]||0)+1; });
+  const bKeys = Object.keys(bins).map(Number).sort((a,b)=>a-b);
+  chartInstances.push(new Chart(document.getElementById('histChart'), {
+    type: 'bar',
+    data: { labels: bKeys.map(b => fmtTime(b)+'–'+fmtTime(b+60)), datasets: [{ label:'Runs', data: bKeys.map(b=>bins[b]), backgroundColor: '#2b233d', borderRadius: 3 }] },
+    options: { maintainAspectRatio: false, plugins: { legend: { display: false } },
+      scales: { x: { ticks: { maxRotation: 60, minRotation: 45, font: { size: 10 } }, grid: { display: false } },
+                y: { beginAtZero: true, ticks: { stepSize: 2 }, grid: { color: '#eee' } } }
+    }
+  }));
+
+  // Race times
+  const distances = [
+    { name: '1 mile', km: 1.609, emoji: '⚡' },
+    { name: '5 km (PB)', km: 5, emoji: '🏁' },
+    { name: '10 km', km: 10, emoji: '🏃' },
+    { name: 'Half marathon', km: 21.0975, emoji: '🥈' },
+    { name: 'Marathon', km: 42.195, emoji: '🥇' },
+  ];
+  document.getElementById('raceTimes').innerHTML = `<table style="width:100%; font-size:12px;">
+    ${distances.map(d => { const t = pb.seconds * Math.pow(d.km/5, 1.06); return `<tr>
+      <td style="padding:7px 0;">${d.emoji} ${d.name}</td>
+      <td style="text-align:right; font-weight:700; font-variant-numeric:tabular-nums;">${fmtLong(t)}</td>
+      <td style="text-align:right; color:var(--ink2); font-size:11px; font-variant-numeric:tabular-nums;">${fmtTime(t/d.km)}/km</td>
+    </tr>`; }).join('')}
+  </table><div style="font-size:11px; color:var(--ink2); margin-top:6px;">From 5 km PB of ${pb.time}.</div>`;
+
+  // Next milestones
+  const clubs = [
+    { n: 100, name: '100 Club (red)' },
+    { n: 125, name: '125' },
+    { n: 150, name: '150' },
+    { n: 250, name: '250 Club (green)' },
+    { n: 500, name: '500 Club (black)' },
+  ];
+  document.getElementById('nextMilestones').innerHTML = `<div style="font-size:12px;">
+    ${clubs.map(m => { const pct = Math.min(100, (runner.totalRuns/m.n)*100); const rem = m.n - runner.totalRuns;
+      return `<div style="margin-bottom:9px;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:3px;">
+          <span style="font-weight:600;">${m.name}</span>
+          <span style="color:var(--ink2);">${rem<=0?'✅ achieved':rem+' to go'}</span>
+        </div>
+        <div style="background:var(--bg); border-radius:999px; height:7px; overflow:hidden;">
+          <div style="background:${rem<=0?'#ff4d6d':'#ffa300'}; height:100%; width:${pct}%;"></div>
+        </div>
+      </div>`; }).join('')}
+  </div>`;
+
+  // Heatmap
+  const end = data[data.length-1].d;
+  const start = new Date(end); start.setFullYear(end.getFullYear() - 2);
+  const runDays = new Map(data.map(r => [r.d.toDateString(), r]));
+  const weeks = [];
+  let cursor = new Date(start);
+  while (cursor.getDay() !== 6) cursor.setDate(cursor.getDate()+1);
+  while (cursor <= end) { weeks.push(new Date(cursor)); cursor.setDate(cursor.getDate()+7); }
+  const cellSize = 13, gap = 3;
+  const w = weeks.length * (cellSize+gap) + 40;
+  let svg = `<svg width="${w}" height="${cellSize*2 + 36}" style="font:10px sans-serif;">`;
+  let prevMonth = -1;
+  weeks.forEach((wk, i) => {
+    const m = wk.getMonth();
+    if (m !== prevMonth && wk.getDate() <= 14) {
+      svg += `<text x="${40+i*(cellSize+gap)}" y="10" fill="#5c5773">${wk.toLocaleString('en',{month:'short'})}</text>`;
+      prevMonth = m;
+    }
+  });
+  weeks.forEach((wk, i) => {
+    const run = runDays.get(wk.toDateString());
+    const color = run ? (run.pb ? '#ff4d6d' : (run.ageGrade > 45 ? '#2b233d' : run.ageGrade > 40 ? '#7460a3' : '#c3b8dc')) : '#ece8f3';
+    const title = run ? `${run.date}: ${run.time} (${run.ageGrade}%)` : wk.toLocaleDateString('en-GB')+': no run';
+    svg += `<rect x="${40+i*(cellSize+gap)}" y="15" width="${cellSize}" height="${cellSize}" fill="${color}" rx="2"><title>${title}</title></rect>`;
+  });
+  svg += `<text x="40" y="${15+cellSize+16}" fill="#5c5773">less</text>`;
+  ['#ece8f3','#c3b8dc','#7460a3','#2b233d','#ff4d6d'].forEach((c,i) => {
+    svg += `<rect x="${75+i*18}" y="${15+cellSize+8}" width="12" height="12" fill="${c}" rx="2"/>`;
+  });
+  svg += `<text x="${75+5*18+4}" y="${15+cellSize+16}" fill="#5c5773">more / PB</text></svg>`;
+  document.getElementById('heatmap').innerHTML = svg;
+
+  // Weather
+  const wData = data.filter(r => r.weather);
+  if (wData.length) {
+    chartInstances.push(new Chart(document.getElementById('weatherChart'), {
+      type: 'scatter',
+      data: { datasets: [{ label: 'Run', data: wData.map(r => ({x:r.weather.tmax, y:r.seconds, date:r.date, time:r.time, rain:r.weather.rain, wind:r.weather.wind, pb:r.pb})),
+        backgroundColor: ctx => ctx.raw && ctx.raw.pb ? '#ff4d6d' : '#00b6c4',
+        pointRadius: ctx => ctx.raw && ctx.raw.pb ? 7 : 5, pointHoverRadius: 8 }] },
+      options: { maintainAspectRatio: false, plugins: { legend: { display: false },
+        tooltip: { callbacks: { label: c => { const r=c.raw; return [r.date+'  '+r.time+(r.pb?' (PB)':''), 'Temp: '+r.x+'°C', 'Rain: '+r.rain+'mm', 'Wind: '+r.wind+' km/h']; } } } },
+        scales: { x: { title: { display: true, text: 'Max temp (°C)' }, grid: { color: '#eee' } },
+                  y: { reverse: true, ticks: { callback: v => fmtTime(v) }, grid: { color: '#eee' } } }
+      }
+    }));
+    const rT = pearson(wData.map(r=>r.weather.tmax), wData.map(r=>r.seconds));
+    const rR = pearson(wData.map(r=>r.weather.rain), wData.map(r=>r.seconds));
+    const rW = pearson(wData.map(r=>r.weather.wind), wData.map(r=>r.seconds));
+    document.getElementById('weatherInsight').innerHTML = `Correlation &mdash; temp: <b>${rT.toFixed(2)}</b>, rain: <b>${rR.toFixed(2)}</b>, wind: <b>${rW.toFixed(2)}</b>.`;
+
+    const byTemp = [...wData].sort((a,b) => a.weather.tmax - b.weather.tmax);
+    const rainy = [...wData].sort((a,b) => b.weather.rain - a.weather.rain)[0];
+    const windy = [...wData].sort((a,b) => b.weather.wind - a.weather.wind)[0];
+    function wCard(label, r, detail) {
+      return `<div style="background:var(--bg); padding:9px; border-radius:8px; margin-bottom:6px;">
+        <div style="color:var(--ink2); font-size:10px; text-transform:uppercase; letter-spacing:.5px;">${label}</div>
+        <div style="font-weight:700; margin-top:2px;">${detail}</div>
+        <div style="font-size:11px; color:var(--ink2);">${r.date} &middot; ${r.time} &middot; AG ${r.ageGrade}%</div>
+      </div>`;
+    }
+    document.getElementById('weatherExtremes').innerHTML =
+      wCard('🥶 Coldest', byTemp[0], byTemp[0].weather.tmax+'°C max / '+byTemp[0].weather.tmin+'°C min') +
+      wCard('🥵 Hottest', byTemp[byTemp.length-1], byTemp[byTemp.length-1].weather.tmax+'°C') +
+      wCard('🌧 Wettest', rainy, rainy.weather.rain+'mm') +
+      wCard('💨 Windiest', windy, windy.weather.wind+' km/h');
+  } else {
+    document.getElementById('weatherChart').parentElement.parentElement.style.display = 'none';
+    document.getElementById('weatherExtremes').parentElement.style.display = 'none';
+  }
+
+  // Table
+  const tbody = document.querySelector('#runTable tbody');
+  let sortKey = 'date', sortDir = -1;
+  function renderTable() {
+    const sorted = [...data].sort((a,b) => {
+      let av=a[sortKey], bv=b[sortKey];
+      if (sortKey==='date') { av=a.d; bv=b.d; }
+      return av > bv ? sortDir : av < bv ? -sortDir : 0;
+    });
+    tbody.innerHTML = sorted.map(r => `<tr>
+      <td>${r.date}</td><td>${r.run}</td><td>${r.pos}</td><td>${r.time}</td>
+      <td>${r.ageGrade.toFixed(2)}%</td><td>${r.pb?'<span class="pb-flag">PB</span>':''}</td>
+    </tr>`).join('');
+  }
+  renderTable();
+  document.querySelectorAll('#runTable th[data-sort]').forEach(th => {
+    th.onclick = () => { const k = th.dataset.sort; if (k===sortKey) sortDir*=-1; else { sortKey=k; sortDir=-1; } renderTable(); };
+  });
+}
+
+render();
+</script>
+</body>
+</html>
