@@ -1,8 +1,12 @@
 name: Build dashboard
 on:
   schedule:
-    # Saturdays at 12:00 UTC — after parkrun results publish
+    # Saturdays after parkrun results publish. Multiple attempts improve the
+    # chance of landing on a GitHub runner that parkrun allows through.
     - cron: '0 12 * * 6'
+    - cron: '0 13 * * 6'
+    - cron: '0 15 * * 6'
+    - cron: '0 18 * * 6'
   workflow_dispatch:   # manual trigger from the Actions tab
   push:
     branches: [ main ]
