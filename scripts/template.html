@@ -193,8 +193,8 @@ function renderH2H() {
           ${stats.map((s,i) => `<th style="color:${COLORS[i]}; text-align:left;">${s.short}</th>`).join('')}
         </tr></thead>
         <tbody>
-          ${cmpRow('Total runs', stats.map(s => s.totalRuns), v => v)}
-          ${cmpRow('Widnes runs', stats.map(s => s.homeRuns), v => v)}
+          ${cmpRow('Total runs', stats.map(s => s.totalRuns), v => v, 'higher')}
+          ${cmpRow('Widnes runs', stats.map(s => s.homeRuns), v => v, 'higher')}
           ${cmpRow('Personal best', stats.map(s => s.pb), v => fmtTime(v.seconds) + ' (' + v.date + ')')}
           ${cmpRow('Average time', stats.map(s => s.avg), v => fmtTime(v))}
           ${cmpRow('Best age grade', stats.map(s => s.bestAG), v => v.ageGrade.toFixed(2) + '%', 'higher')}
