@@ -138,7 +138,12 @@ function renderH2H() {
     const avgAG = d.reduce((s,x) => s+x.ageGrade, 0) / d.length;
     const bestPos = d.reduce((a,b) => b.pos < a.pos ? b : a);
     const pbs = d.filter(x => x.pb).length;
-    return { ...r, pb, avg, bestAG, avgAG, bestPos, pbs };
+    const sub30 = d.filter(x => x.seconds < 30*60).length;
+    const sub35 = d.filter(x => x.seconds < 35*60).length;
+    // Fastest 3-run average
+    const top3 = [...d].sort((a,b) => a.seconds - b.seconds).slice(0, 3);
+    const top3avg = top3.reduce((s,x) => s+x.seconds, 0) / top3.length;
+    return { ...r, pb, avg, bestAG, avgAG, bestPos, pbs, sub30, sub35, top3avg };
   }).filter(Boolean);
 
   // Shared race days (same date on same course)
@@ -196,6 +201,9 @@ function renderH2H() {
           ${cmpRow('Total runs', stats.map(s => s.totalRuns), v => v, 'higher')}
           ${cmpRow('Widnes runs', stats.map(s => s.homeRuns), v => v, 'higher')}
           ${cmpRow('Personal best', stats.map(s => s.pb), v => fmtTime(v.seconds) + ' (' + v.date + ')')}
+          ${cmpRow('Fastest 3-run avg', stats.map(s => s.top3avg), v => fmtTime(v))}
+          ${cmpRow('Sub-30 runs 🚀', stats.map(s => s.sub30), v => v, 'higher')}
+          ${cmpRow('Sub-35 runs', stats.map(s => s.sub35), v => v, 'higher')}
           ${cmpRow('Average time', stats.map(s => s.avg), v => fmtTime(v))}
           ${cmpRow('Best age grade', stats.map(s => s.bestAG), v => v.ageGrade.toFixed(2) + '%', 'higher')}
           ${cmpRow('Avg age grade', stats.map(s => s.avgAG), v => v.toFixed(2) + '%', 'higher')}
