@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
- <head>
+ <html lang="en">
+<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#2b233d">
@@ -705,16 +705,18 @@ function render() {
   ];
   const shirtImg = (n, achieved) => `<img src="${SHIRTS[n]||''}" alt="${n} shirt" style="width:100%; height:auto; display:block; filter:${achieved?'none':'grayscale(100%) opacity(0.45)'};">`;
   document.getElementById('nextMilestones').innerHTML = `
-    <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:18px; font-size:13px; align-items:end;">
+    <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:14px; font-size:13px; align-items:start;">
       ${clubs.map(m => {
         const pct = Math.min(100, (runner.totalRuns/m.n)*100);
         const rem = m.n - runner.totalRuns;
         const achieved = rem <= 0;
-        return `<div style="text-align:center;">
-          <div style="aspect-ratio:220/460; display:flex; align-items:flex-start; justify-content:center;">${shirtImg(m.n, achieved)}</div>
-          <div style="font-size:11px; color:var(--ink2); text-transform:uppercase; letter-spacing:.5px; margin-top:8px;">${m.n} club</div>
-          <div style="font-weight:800; margin-top:2px; font-size:14px;">${achieved ? '✅ earned' : rem + ' to go'}</div>
-          <div style="background:var(--bg); border-radius:999px; height:7px; overflow:hidden; margin-top:6px;">
+        return `<div style="display:flex; flex-direction:column; align-items:center; text-align:center;">
+          <div style="width:100%; aspect-ratio:220/451; display:flex; align-items:center; justify-content:center;">
+            <img src="${SHIRTS[m.n]||''}" alt="${m.n} shirt" style="max-width:100%; max-height:100%; width:auto; height:auto; object-fit:contain; display:block; filter:${achieved?'none':'grayscale(100%) opacity(0.45)'};">
+          </div>
+          <div style="font-size:10px; color:var(--ink2); text-transform:uppercase; letter-spacing:.5px; margin-top:8px; min-height:14px;">${m.n} club</div>
+          <div style="font-weight:800; margin-top:2px; font-size:13px; min-height:18px;">${achieved ? '✅ earned' : rem + ' to go'}</div>
+          <div style="background:var(--bg); border-radius:999px; height:7px; overflow:hidden; margin-top:6px; width:100%;">
             <div style="background:${achieved?m.color:'#ffa300'}; height:100%; width:${pct}%;"></div>
           </div>
         </div>`;
