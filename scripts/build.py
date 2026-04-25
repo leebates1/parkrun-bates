@@ -21,20 +21,33 @@ OUT = ROOT / "docs" / "index.html"
 
 _override = os.environ.get("CURL_IMPERSONATE")
 IMPERSONATE_PROFILES = [_override] if _override else [
-    "chrome120",
     "chrome131",
-    "chrome136",
-    "safari17_0",
+    "firefox147",
+    "safari260",
     "firefox133",
+    "chrome120",
+    "chrome131_android",
+    "tor145",
 ]
 APP_UA = "parkrun/1.2.7 CFNetwork/1121.2.2 Darwin/19.3.0"
+
+
+_sessions = {}
+
+
+def _session(profile):
+    s = _sessions.get(profile)
+    if s is None:
+        s = cffi.Session(impersonate=profile)
+        _sessions[profile] = s
+    return s
 
 
 def _impersonated(method, url, **kwargs):
     last_err = None
     for i, profile in enumerate(IMPERSONATE_PROFILES):
         try:
-            resp = cffi.request(method, url, impersonate=profile, timeout=30, **kwargs)
+            resp = _session(profile).request(method, url, timeout=30, **kwargs)
             resp.raise_for_status()
             if i > 0:
                 print(f"  (succeeded with fallback profile {profile})", file=sys.stderr)
@@ -120,6 +133,45 @@ def parse_runner(html, runner_id):
         })
     out["results"] = results
     return out
+
+
+def parse_latest_event(html):
+    m = re.search(r'class="format-date">(\d{4})-(\d{2})-(\d{2})</span>', html)
+    if not m:
+        raise ValueError("Could not parse event date from latestresults page")
+    yy, mm, dd = m.group(1), m.group(2), m.group(3)
+    display_date = f"{dd}/{mm}/{yy}"
+
+    rm = re.search(r'class="format-date">[^<]+</span>.*?<span>#(\d+)</span>', html, re.DOTALL)
+    run_num = int(rm.group(1)) if rm else 0
+
+    rows = {}
+    for row_html in re.findall(r'<tr class="Results-table-row".*?</tr>', html, re.DOTALL):
+        am = re.search(r'parkrunner/(\d+)', row_html)
+        pm = re.search(r'data-position="(\d+)"', row_html)
+        agm = re.search(r'data-agegrade="([\d.]+)%?"', row_html)
+        tm = re.search(
+            r'Results-table-td--time.*?<div class="compact"[^>]*>([\d:]+)</div>',
+            row_html, re.DOTALL,
+        )
+        if not (am and pm and tm):
+            continue
+        ach = re.search(r'data-achievement="([^"]*)"', row_html)
+        rows[am.group(1)] = {
+            "date": display_date,
+            "run": run_num,
+            "pos": int(pm.group(1)),
+            "time": tm.group(1),
+            "ageGrade": float(agm.group(1)) if agm else 0.0,
+            "pb": bool(ach and "PB" in ach.group(1)),
+        }
+    return rows
+
+
+def fetch_latest_event_results(event):
+    url = f"https://www.parkrun.org.uk/{event}/results/latestresults/"
+    print(f"Fetching latest event results: {url}", file=sys.stderr)
+    return parse_latest_event(fetch(url))
 
 
 def slugify(value):
@@ -352,6 +404,25 @@ def main():
             runners.append(parsed)
             live_data = True
             time.sleep(2)  # be polite
+
+    if not live_data and runners:
+        try:
+            latest_rows = fetch_latest_event_results(CONFIG["event"])
+        except (RequestException, ValueError) as e:
+            print(f"latestresults fallback failed: {e}", file=sys.stderr)
+            latest_rows = {}
+        for runner in runners:
+            row = latest_rows.get(str(runner["id"]))
+            if not row:
+                continue
+            existing_runs = {r.get("run") for r in runner.get("results", [])}
+            if row["run"] in existing_runs:
+                continue
+            runner.setdefault("results", []).insert(0, row)
+            runner["totalRuns"] = (runner.get("totalRuns") or 0) + 1
+            runner["homeRuns"] = (runner.get("homeRuns") or 0) + 1
+            live_data = True
+            print(f"  Appended this week's result for {runner['name']} via latestresults", file=sys.stderr)
 
     if not runners:
         print("No runners scraped and no cached dashboard data — aborting.", file=sys.stderr)
