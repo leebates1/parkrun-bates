@@ -22,13 +22,15 @@
     --pr-purple: #2b233d; --pr-purple2: #3d3155;
     --accent: #ffa300; --accent2: #00b6c4; --pb: #ff4d6d;
     --bg: #f5f3fb; --card: #ffffff; --ink: #1b1730; --ink2: #5c5773; --line: #e6e1ef;
+    --grid: #eeeaf5;
   }
   * { box-sizing: border-box; }
   body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.5; }
   header { background:linear-gradient(135deg,var(--pr-purple),var(--pr-purple2)); color:white; padding:24px 20px; box-shadow:0 2px 10px rgba(0,0,0,.12); position:relative; }
   header h1 { margin:0 0 4px; font-size:22px; font-weight:700; padding-right:100px; }
   header .meta { opacity:.85; font-size:13px; padding-right:100px; }
-  header .pr-logo { position:absolute; top:20px; right:20px; width:80px; height:auto; filter:brightness(0) invert(1); opacity:.9; }
+  header .pr-logo { position:absolute; top:20px; right:24px; width:140px; height:auto; filter:brightness(0) invert(1); opacity:.9; }
+  header h1 { padding-right:160px; } header .meta { padding-right:160px; }
   @media (max-width:480px) { header .pr-logo { width:60px; top:16px; right:16px; } header h1 { padding-right:70px; } header .meta { padding-right:70px; } }
   .badge { display:inline-block; background:var(--accent); color:var(--pr-purple); padding:2px 9px; border-radius:999px; font-weight:700; font-size:11px; margin-left:6px; vertical-align:middle; }
   .runner-switcher { display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; }
@@ -302,8 +304,8 @@ function renderH2H() {
           return c.dataset.label + ' — ' + r.date + '  ' + r.time + (r.pb?' (PB)':'') + '  ·  AG ' + r.ag + '%';
         } } } },
       scales: {
-        x: { type: 'time', time: { unit: 'month' }, grid: { color: '#eee' } },
-        y: { reverse: true, ticks: { callback: v => fmtTime(v) }, grid: { color: '#eee' } }
+        x: { type: 'time', time: { unit: 'month' }, grid: { color: () => getComputedStyle(document.documentElement).getPropertyValue('--grid').trim() || '#eee' } },
+        y: { reverse: true, ticks: { callback: v => fmtTime(v) }, grid: { color: () => getComputedStyle(document.documentElement).getPropertyValue('--grid').trim() || '#eee' } }
       }
     }
   }));
@@ -327,8 +329,8 @@ function renderH2H() {
     options: { maintainAspectRatio: false,
       plugins: { legend: { position: 'bottom' },
         tooltip: { callbacks: { label: c => c.dataset.label + ' — ' + c.raw.date + ': ' + c.raw.time } } },
-      scales: { x: { type: 'time', time: { unit: 'month' }, grid: { color: '#eee' } },
-                y: { reverse: true, ticks: { callback: v => fmtTime(v) }, grid: { color: '#eee' } } }
+      scales: { x: { type: 'time', time: { unit: 'month' }, grid: { color: () => getComputedStyle(document.documentElement).getPropertyValue('--grid').trim() || '#eee' } },
+                y: { reverse: true, ticks: { callback: v => fmtTime(v) }, grid: { color: () => getComputedStyle(document.documentElement).getPropertyValue('--grid').trim() || '#eee' } } }
     }
   }));
 
@@ -347,8 +349,8 @@ function renderH2H() {
       plugins: { legend: { display: false },
         tooltip: { callbacks: { label: c => c.raw.date ? [c.raw.date, runners[0].short + ': ' + c.raw.a, runners[1].short + ': ' + c.raw.b] : '' } } },
       scales: {
-        x: { min: minT, max: maxT, ticks: { callback: v => fmtTime(v) }, title: { display: true, text: runners[0].short + '\'s time' }, grid: { color: '#eee' } },
-        y: { min: minT, max: maxT, ticks: { callback: v => fmtTime(v) }, title: { display: true, text: runners[1].short + '\'s time' }, grid: { color: '#eee' } }
+        x: { min: minT, max: maxT, ticks: { callback: v => fmtTime(v) }, title: { display: true, text: runners[0].short + '\'s time' }, grid: { color: () => getComputedStyle(document.documentElement).getPropertyValue('--grid').trim() || '#eee' } },
+        y: { min: minT, max: maxT, ticks: { callback: v => fmtTime(v) }, title: { display: true, text: runners[1].short + '\'s time' }, grid: { color: () => getComputedStyle(document.documentElement).getPropertyValue('--grid').trim() || '#eee' } }
       }
     }
   }));
@@ -424,11 +426,19 @@ function render() {
     </div>
 
     <div class="grid"><div class="card" style="grid-column:1/-1;">
+      <h2>Milestone shirts</h2>
+      <div id="nextMilestones"></div>
+    </div></div>
+
+    <div class="grid"><div class="card" style="grid-column:1/-1;">
       <h2>Finish time over time</h2>
+      <div id="streakRibbon" style="display:flex; align-items:center; gap:10px; padding:8px 10px; margin-bottom:10px; background:linear-gradient(90deg, rgba(255,163,0,.15), rgba(255,77,109,.15)); border-radius:8px; font-size:12px;"></div>
       <div class="controls">
         <button class="btn active" data-range="all">All</button>
         <button class="btn" data-range="2y">2 yrs</button>
         <button class="btn" data-range="1y">12 mo</button>
+        <span style="flex:1;"></span>
+        <button class="btn" data-mode="yoy" id="yoyBtn">Year-on-year</button>
       </div>
       <div class="chart-wrap tall"><canvas id="timeChart"></canvas></div>
     </div></div>
@@ -449,8 +459,7 @@ function render() {
     </div>
 
     <div class="grid">
-      <div class="card"><h2>Equivalent race times <span style="font-size:10px; color:var(--ink2); font-weight:normal;">(Riegel from 5k PB)</span></h2><div id="raceTimes"></div></div>
-      <div class="card"><h2>Next milestones</h2><div id="nextMilestones"></div></div>
+      <div class="card" style="grid-column:1/-1;"><h2>Equivalent race times <span style="font-size:10px; color:var(--ink2); font-weight:normal;">(Riegel from 5k PB)</span></h2><div id="raceTimes"></div></div>
     </div>
 
     <div class="card" style="margin-bottom:14px;"><h2>Activity heatmap (last 2 yrs)</h2><div id="heatmap" style="overflow-x:auto;"></div></div>
@@ -482,8 +491,22 @@ function render() {
     </div>
   `;
 
+  // Streak ribbon
+  document.getElementById('streakRibbon').innerHTML = `
+    <span style="font-size:18px;">🔥</span>
+    <div style="flex:1;">
+      <div style="font-weight:700;">Longest streak: ${longestStreak} consecutive weeks</div>
+      <div style="color:var(--ink2); font-size:11px;">${bestStart.date} → ${bestEnd.date}</div>
+    </div>
+    <div style="text-align:right;">
+      <div style="font-weight:700;">${data.length} total runs</div>
+      <div style="color:var(--ink2); font-size:11px;">${pbs.length} PBs · ${(data.length*5).toLocaleString()} km</div>
+    </div>`;
+
   // Time chart
   let timeChart;
+  const yearColors = ['#9c89c4','#7460a3','#4f3d80','#00b6c4','#ffa300','#ff4d6d','#2b233d','#5cc67a'];
+  const gridColor = () => getComputedStyle(document.documentElement).getPropertyValue('--grid').trim() || '#eee';
   function drawTime(range) {
     const now = data[data.length-1].d;
     let filtered = data;
@@ -496,7 +519,7 @@ function render() {
     timeChart = new Chart(document.getElementById('timeChart'), {
       type: 'line',
       data: { datasets: [
-        { label: 'Time', data: pts, borderColor: '#2b233d',
+        { label: 'Time', data: pts, borderColor: '#7460a3',
           backgroundColor: ctx => ctx.raw && ctx.raw.pb ? '#ff4d6d' : '#ffa300',
           pointRadius: ctx => ctx.raw && ctx.raw.pb ? 6 : 3, pointHoverRadius: 7, borderWidth: 1.5, tension: 0.15 },
         { label: 'Running PB', data: bestLine, borderColor: '#ff4d6d', borderDash: [6,4], borderWidth: 2, pointRadius: 0, fill: false, stepped: 'after' }
@@ -509,8 +532,40 @@ function render() {
             return [r.date, 'Time: ' + r.time + (r.pb?'  (PB)':''), 'Age grade: ' + r.ag + '%', 'Position: ' + r.pos];
           } } } },
         scales: {
-          x: { type: 'time', time: { unit: 'month' }, grid: { color: '#eee' } },
-          y: { reverse: true, ticks: { callback: v => fmtTime(v) }, grid: { color: '#eee' } }
+          x: { type: 'time', time: { unit: 'month' }, grid: { color: () => gridColor() } },
+          y: { reverse: true, ticks: { callback: v => fmtTime(v) }, grid: { color: () => gridColor() } }
+        }
+      }
+    });
+    chartInstances.push(timeChart);
+  }
+  function drawTimeYoY() {
+    const byYear = {};
+    data.forEach(r => {
+      const y = r.d.getFullYear();
+      const start = new Date(y, 0, 1);
+      const doy = Math.floor((r.d - start) / 86400000);
+      (byYear[y] = byYear[y] || []).push({ x: doy, y: r.seconds, date: r.date, time: r.time });
+    });
+    const datasets = Object.keys(byYear).sort().map((y, i) => ({
+      label: y,
+      data: byYear[y].sort((a,b)=>a.x-b.x),
+      borderColor: yearColors[i % yearColors.length],
+      backgroundColor: yearColors[i % yearColors.length],
+      pointRadius: 2.5, pointHoverRadius: 6, borderWidth: 2, tension: 0.25, fill: false
+    }));
+    if (timeChart) { timeChart.destroy(); chartInstances = chartInstances.filter(c => c !== timeChart); }
+    timeChart = new Chart(document.getElementById('timeChart'), {
+      type: 'line',
+      data: { datasets },
+      options: { maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom' },
+          tooltip: { callbacks: { label: c => c.dataset.label + ' · ' + c.raw.date + ' · ' + c.raw.time } } },
+        scales: {
+          x: { type: 'linear', min: 0, max: 366, title: { display: true, text: 'Day of year' },
+               ticks: { callback: v => { const d = new Date(2024, 0, 1+v); return d.toLocaleDateString('en-GB', { month: 'short' }); }, stepSize: 30 },
+               grid: { color: () => gridColor() } },
+          y: { reverse: true, ticks: { callback: v => fmtTime(v) }, grid: { color: () => gridColor() } }
         }
       }
     });
@@ -519,8 +574,14 @@ function render() {
   drawTime('all');
   document.querySelectorAll('.btn[data-range]').forEach(b => b.onclick = () => {
     document.querySelectorAll('.btn[data-range]').forEach(x => x.classList.remove('active'));
+    document.getElementById('yoyBtn').classList.remove('active');
     b.classList.add('active'); drawTime(b.dataset.range);
   });
+  document.getElementById('yoyBtn').onclick = () => {
+    document.querySelectorAll('.btn[data-range]').forEach(x => x.classList.remove('active'));
+    document.getElementById('yoyBtn').classList.add('active');
+    drawTimeYoY();
+  };
 
   // Year chart
   const byYear = {};
@@ -532,7 +593,7 @@ function render() {
       backgroundColor: ['#9c89c4','#7460a3','#4f3d80','#2b233d','#00b6c4','#ffa300','#ff4d6d'], borderRadius: 6 }] },
     options: { maintainAspectRatio: false,
       plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => fmtTime(c.raw) + '  (' + byYear[c.label].date + ')' } } },
-      scales: { y: { ticks: { callback: v => fmtTime(v) }, grid: { color: '#eee' } } }
+      scales: { y: { ticks: { callback: v => fmtTime(v) }, grid: { color: () => getComputedStyle(document.documentElement).getPropertyValue('--grid').trim() || '#eee' } } }
     }
   }));
 
@@ -542,8 +603,8 @@ function render() {
     data: { datasets: [{ label: 'Age grade %', data: data.map(r => ({x:r.d, y:r.ageGrade})),
       borderColor: '#00b6c4', backgroundColor: 'rgba(0,182,196,.15)', fill: true, pointRadius: 2, tension: 0.25 }] },
     options: { maintainAspectRatio: false, plugins: { legend: { display: false } },
-      scales: { x: { type: 'time', time: { unit: 'month' }, grid: { color: '#eee' } },
-                y: { ticks: { callback: v => v + '%' }, grid: { color: '#eee' } } }
+      scales: { x: { type: 'time', time: { unit: 'month' }, grid: { color: () => getComputedStyle(document.documentElement).getPropertyValue('--grid').trim() || '#eee' } },
+                y: { ticks: { callback: v => v + '%' }, grid: { color: () => getComputedStyle(document.documentElement).getPropertyValue('--grid').trim() || '#eee' } } }
     }
   }));
 
@@ -557,8 +618,8 @@ function render() {
       borderColor: '#ff4d6d', backgroundColor: '#ff4d6d', pointRadius: 6, pointHoverRadius: 8, stepped: 'after', borderWidth: 2 }] },
     options: { maintainAspectRatio: false,
       plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => c.raw.date + ' → ' + c.raw.time } } },
-      scales: { x: { type: 'time', time: { unit: 'month' }, grid: { color: '#eee' } },
-                y: { reverse: true, ticks: { callback: v => fmtTime(v) }, grid: { color: '#eee' } } }
+      scales: { x: { type: 'time', time: { unit: 'month' }, grid: { color: () => getComputedStyle(document.documentElement).getPropertyValue('--grid').trim() || '#eee' } },
+                y: { reverse: true, ticks: { callback: v => fmtTime(v) }, grid: { color: () => getComputedStyle(document.documentElement).getPropertyValue('--grid').trim() || '#eee' } } }
     }
   }));
 
@@ -600,7 +661,7 @@ function render() {
     data: { labels: mKeys, datasets: [{ label: 'Runs', data: mKeys.map(k => byMonth[k]), backgroundColor: '#ffa300', borderRadius: 3 }] },
     options: { maintainAspectRatio: false, plugins: { legend: { display: false } },
       scales: { x: { ticks: { maxRotation: 90, minRotation: 60, font: { size: 9 } }, grid: { display: false } },
-                y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#eee' } } }
+                y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: () => getComputedStyle(document.documentElement).getPropertyValue('--grid').trim() || '#eee' } } }
     }
   }));
 
@@ -613,7 +674,7 @@ function render() {
     data: { labels: bKeys.map(b => fmtTime(b)+'–'+fmtTime(b+60)), datasets: [{ label:'Runs', data: bKeys.map(b=>bins[b]), backgroundColor: '#2b233d', borderRadius: 3 }] },
     options: { maintainAspectRatio: false, plugins: { legend: { display: false } },
       scales: { x: { ticks: { maxRotation: 60, minRotation: 45, font: { size: 10 } }, grid: { display: false } },
-                y: { beginAtZero: true, ticks: { stepSize: 2 }, grid: { color: '#eee' } } }
+                y: { beginAtZero: true, ticks: { stepSize: 2 }, grid: { color: () => getComputedStyle(document.documentElement).getPropertyValue('--grid').trim() || '#eee' } } }
     }
   }));
 
@@ -634,25 +695,31 @@ function render() {
   </table><div style="font-size:11px; color:var(--ink2); margin-top:6px;">From 5 km PB of ${pb.time}.</div>`;
 
   // Next milestones
+  const SHIRTS = __SHIRTS__;
   const clubs = [
-    { n: 100, name: '100 Club (red)' },
-    { n: 125, name: '125' },
-    { n: 150, name: '150' },
-    { n: 250, name: '250 Club (green)' },
-    { n: 500, name: '500 Club (black)' },
+    { n: 25,  color: '#7b4f9e' },
+    { n: 50,  color: '#d7282f' },
+    { n: 100, color: '#1a1a1a' },
+    { n: 250, color: '#1b5e3f' },
+    { n: 500, color: '#1e5ba8' },
   ];
-  document.getElementById('nextMilestones').innerHTML = `<div style="font-size:12px;">
-    ${clubs.map(m => { const pct = Math.min(100, (runner.totalRuns/m.n)*100); const rem = m.n - runner.totalRuns;
-      return `<div style="margin-bottom:9px;">
-        <div style="display:flex; justify-content:space-between; margin-bottom:3px;">
-          <span style="font-weight:600;">${m.name}</span>
-          <span style="color:var(--ink2);">${rem<=0?'✅ achieved':rem+' to go'}</span>
-        </div>
-        <div style="background:var(--bg); border-radius:999px; height:7px; overflow:hidden;">
-          <div style="background:${rem<=0?'#ff4d6d':'#ffa300'}; height:100%; width:${pct}%;"></div>
-        </div>
-      </div>`; }).join('')}
-  </div>`;
+  const shirtImg = (n, achieved) => `<img src="${SHIRTS[n]||''}" alt="${n} shirt" style="width:100%; height:auto; display:block; filter:${achieved?'none':'grayscale(100%) opacity(0.45)'};">`;
+  document.getElementById('nextMilestones').innerHTML = `
+    <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:18px; font-size:13px; align-items:end;">
+      ${clubs.map(m => {
+        const pct = Math.min(100, (runner.totalRuns/m.n)*100);
+        const rem = m.n - runner.totalRuns;
+        const achieved = rem <= 0;
+        return `<div style="text-align:center;">
+          <div style="aspect-ratio:220/460; display:flex; align-items:flex-start; justify-content:center;">${shirtImg(m.n, achieved)}</div>
+          <div style="font-size:11px; color:var(--ink2); text-transform:uppercase; letter-spacing:.5px; margin-top:8px;">${m.n} club</div>
+          <div style="font-weight:800; margin-top:2px; font-size:14px;">${achieved ? '✅ earned' : rem + ' to go'}</div>
+          <div style="background:var(--bg); border-radius:999px; height:7px; overflow:hidden; margin-top:6px;">
+            <div style="background:${achieved?m.color:'#ffa300'}; height:100%; width:${pct}%;"></div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
 
   // Heatmap
   const end = data[data.length-1].d;
@@ -696,8 +763,8 @@ function render() {
         pointRadius: ctx => ctx.raw && ctx.raw.pb ? 7 : 5, pointHoverRadius: 8 }] },
       options: { maintainAspectRatio: false, plugins: { legend: { display: false },
         tooltip: { callbacks: { label: c => { const r=c.raw; return [r.date+'  '+r.time+(r.pb?' (PB)':''), 'Temp: '+r.x+'°C', 'Rain: '+r.rain+'mm', 'Wind: '+r.wind+' km/h']; } } } },
-        scales: { x: { title: { display: true, text: 'Max temp (°C)' }, grid: { color: '#eee' } },
-                  y: { reverse: true, ticks: { callback: v => fmtTime(v) }, grid: { color: '#eee' } } }
+        scales: { x: { title: { display: true, text: 'Max temp (°C)' }, grid: { color: () => getComputedStyle(document.documentElement).getPropertyValue('--grid').trim() || '#eee' } },
+                  y: { reverse: true, ticks: { callback: v => fmtTime(v) }, grid: { color: () => getComputedStyle(document.documentElement).getPropertyValue('--grid').trim() || '#eee' } } }
       }
     }));
     const rT = pearson(wData.map(r=>r.weather.tmax), wData.map(r=>r.seconds));

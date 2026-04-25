@@ -453,7 +453,9 @@ def main():
         "event": CONFIG["event"],
         "runners": runners,
     }
-    html = TEMPLATE.replace("__DATA__", json.dumps(payload))
+    shirts_path = ROOT / "scripts" / "shirts_data.json"
+    shirts_json = shirts_path.read_text() if shirts_path.exists() else "{}"
+    html = TEMPLATE.replace("__DATA__", json.dumps(payload)).replace("__SHIRTS__", shirts_json)
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(html)
     print(f"Wrote {OUT} ({len(html):,} bytes)", file=sys.stderr)
