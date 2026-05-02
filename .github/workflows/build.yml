@@ -16,6 +16,7 @@ on:
 
 permissions:
   contents: write
+  pages: write
 
 jobs:
   build:
@@ -33,6 +34,7 @@ jobs:
           PARKRUN_PASSWORD: ${{ secrets.PARKRUN_PASSWORD }}
         run: python scripts/build.py
       - name: Commit updated dashboard
+        id: commit
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -40,6 +42,15 @@ jobs:
           if ! git diff --staged --quiet; then
             git commit -m "chore: weekly dashboard update"
             git push
+            echo "pushed=true" >> "$GITHUB_OUTPUT"
           else
             echo "No changes to commit."
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
           fi
+      - name: Trigger Pages rebuild
+        # Bot pushes via GITHUB_TOKEN don't trigger downstream workflows,
+        # so request a Pages build explicitly when we actually pushed.
+        if: steps.commit.outputs.pushed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh api -X POST /repos/${{ github.repository }}/pages/builds
