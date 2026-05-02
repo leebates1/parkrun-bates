@@ -405,11 +405,14 @@ def main():
             live_data = True
             time.sleep(2)  # be polite
 
-    if not live_data and runners:
+    # Always enrich with the public latestresults page — the app API can lag
+    # by hours on Saturday morning while the latestresults page is already
+    # populated. This pass is idempotent (skips runs already present).
+    if runners:
         try:
             latest_rows = fetch_latest_event_results(CONFIG["event"])
         except (RequestException, ValueError) as e:
-            print(f"latestresults fallback failed: {e}", file=sys.stderr)
+            print(f"latestresults enrichment failed: {e}", file=sys.stderr)
             latest_rows = {}
         for runner in runners:
             row = latest_rows.get(str(runner["id"]))
