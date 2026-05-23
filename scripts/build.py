@@ -441,11 +441,15 @@ def main():
     weather_start = all_iso_dates[0]
     weather_end = all_iso_dates[-1]
     print(f"Fetching weather {weather_start} → {weather_end}", file=sys.stderr)
-    weather = fetch_weather(
-        CONFIG["event_coords"]["lat"],
-        CONFIG["event_coords"]["lon"],
-        weather_start, weather_end,
-    )
+    try:
+        weather = fetch_weather(
+            CONFIG["event_coords"]["lat"],
+            CONFIG["event_coords"]["lon"],
+            weather_start, weather_end,
+        )
+    except Exception as e:
+        print(f"Weather fetch failed ({e}); continuing without weather.", file=sys.stderr)
+        weather = {}
 
     for runner in runners:
         for res in runner["results"]:
