@@ -385,11 +385,12 @@ function render() {
   const avgPos = data.reduce((s,r)=>s+r.pos,0) / data.length;
   const pbs = data.filter(r => r.pb);
 
-  // streaks
+  // streaks — based on consecutive event numbers, not calendar gap, since a
+  // cancelled event week (no run held) advances the date but not the run number
   let longestStreak = 1, currentStreak = 1, streakStart = data[0], bestStart = data[0], bestEnd = data[0];
   for (let i=1; i<data.length; i++) {
-    const gap = (data[i].d - data[i-1].d) / 86400000;
-    if (gap <= 8) { currentStreak++; if (currentStreak > longestStreak) { longestStreak = currentStreak; bestStart = streakStart; bestEnd = data[i]; } }
+    const consecutive = (data[i].run - data[i-1].run) === 1;
+    if (consecutive) { currentStreak++; if (currentStreak > longestStreak) { longestStreak = currentStreak; bestStart = streakStart; bestEnd = data[i]; } }
     else { currentStreak = 1; streakStart = data[i]; }
   }
   let longestGap = 0, gapStart=data[0], gapEnd=data[0];
