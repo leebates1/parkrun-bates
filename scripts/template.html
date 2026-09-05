@@ -15,6 +15,18 @@
 <meta name="apple-mobile-web-app-title" content="BATES parkrun">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<script>
+// Runs before first paint: pick the theme from the saved preference, falling
+// back to the device setting, so an explicit override never flashes light.
+(function () {
+  var stored = null;
+  try { stored = localStorage.getItem('theme'); } catch (e) {}
+  var mode = (stored === 'light' || stored === 'dark') ? stored : 'system';
+  var dark = mode === 'dark' || (mode === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+  document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+  window.__themeMode = mode;
+})();
+</script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 <style>
@@ -32,8 +44,9 @@
     /* activity heatmap ramp: no run → light → mid → strong */
     --hm0: #ece8f3; --hm1: #c3b8dc; --hm2: #7460a3; --hm3: #2b233d;
   }
-  @media (prefers-color-scheme: dark) {
-    :root {
+  :root[data-theme="light"] { color-scheme: light; }
+  :root[data-theme="dark"] {
+      color-scheme: dark;
       --bg: #14111c; --card: #1e1a2b; --ink: #ece9f5; --ink2: #a49dbd; --line: #322c45;
       --grid: #2a2438;
       --head: #c3b8dc;
@@ -42,7 +55,6 @@
       --card-border: #2f2846;
       --bar: #9c89c4;
       --hm0: #241f33; --hm1: #4f3d80; --hm2: #9c89c4; --hm3: #ded4f5;
-    }
   }
   * { box-sizing: border-box; }
   body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.5; }
@@ -56,6 +68,7 @@
   .runner-switcher { display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; }
   .runner-switcher button { background:rgba(255,255,255,.1); color:white; border:1px solid rgba(255,255,255,.25); padding:8px 16px; border-radius:999px; cursor:pointer; font-size:13px; font-weight:600; }
   .runner-switcher button.active { background:white; color:var(--pr-purple); border-color:white; }
+  .runner-switcher .theme-btn { margin-left:auto; order:9; font-size:12px; padding:8px 14px; }
   main { max-width:1200px; margin:0 auto; padding:16px; }
   .kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; margin-bottom:16px; }
   .kpi { background:var(--card); border-radius:12px; padding:14px; box-shadow:0 1px 3px rgba(30,20,60,.08); border:1px solid var(--card-border); border-top:3px solid var(--accent); }
@@ -108,7 +121,7 @@
   </a>
   <h1 id="headerName">Loading…</h1>
   <div class="meta" id="headerMeta"></div>
-  <div class="runner-switcher" id="switcher"></div>
+  <div class="runner-switcher" id="switcher"><button class="theme-btn" id="themeBtn" type="button"></button></div>
 </header>
 
 <main id="app"></main>
@@ -149,17 +162,19 @@ function pearson(xs, ys) {
 
 // switcher buttons
 const swEl = document.getElementById('switcher');
+// the theme toggle shares this row, so never index swEl.children directly
+const runnerBtns = () => [...swEl.querySelectorAll('button:not(.theme-btn)')];
 PAYLOAD.runners.forEach((r, i) => {
   const b = document.createElement('button');
   b.textContent = r.short;
   b.className = i === 0 ? 'active' : '';
-  b.onclick = () => { activeRunner = i; [...swEl.children].forEach((x,j) => x.classList.toggle('active', j===i)); render(); };
+  b.onclick = () => { activeRunner = i; runnerBtns().forEach((x,j) => x.classList.toggle('active', j===i)); render(); };
   swEl.appendChild(b);
 });
 if (PAYLOAD.runners.length >= 2) {
   const vs = document.createElement('button');
   vs.textContent = '⚡ Head-to-head';
-  vs.onclick = () => { activeRunner = 'vs'; [...swEl.children].forEach(x => x.classList.remove('active')); vs.classList.add('active'); renderH2H(); };
+  vs.onclick = () => { activeRunner = 'vs'; runnerBtns().forEach(x => x.classList.remove('active')); vs.classList.add('active'); renderH2H(); };
   swEl.appendChild(vs);
 }
 
@@ -912,15 +927,36 @@ function render() {
   });
 }
 
-syncTheme();
-render();
+// Theme toggle: Auto → Light → Dark → Auto. Canvas colours are baked in at
+// draw time, so any change has to redraw the active view.
+const THEMES = [
+  { mode: 'system', label: '◐ Auto',  title: 'Theme: following your device' },
+  { mode: 'light',  label: '☀️ Light', title: 'Theme: always light' },
+  { mode: 'dark',   label: '🌙 Dark',  title: 'Theme: always dark' },
+];
+const prefersDark = matchMedia('(prefers-color-scheme: dark)');
+const themeBtn = document.getElementById('themeBtn');
+let themeMode = window.__themeMode || 'system';
 
-// Canvas colours are baked in at draw time, so redraw the active view when the
-// OS flips between light and dark.
-matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+function applyTheme(redraw) {
+  const dark = themeMode === 'dark' || (themeMode === 'system' && prefersDark.matches);
+  document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+  const t = THEMES.find(x => x.mode === themeMode);
+  themeBtn.textContent = t.label;
+  themeBtn.title = t.title;
+  themeBtn.setAttribute('aria-label', t.title);
   syncTheme();
-  if (activeRunner === 'vs') renderH2H(); else render();
-});
+  if (redraw) { if (activeRunner === 'vs') renderH2H(); else render(); }
+}
+themeBtn.onclick = () => {
+  themeMode = THEMES[(THEMES.findIndex(x => x.mode === themeMode) + 1) % THEMES.length].mode;
+  try { localStorage.setItem('theme', themeMode); } catch (e) {}
+  applyTheme(true);
+};
+prefersDark.addEventListener('change', () => { if (themeMode === 'system') applyTheme(true); });
+
+applyTheme(false);
+render();
 </script>
 </body>
 </html>
