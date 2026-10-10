@@ -91,6 +91,7 @@
   th { background:var(--bg); font-weight:600; color:var(--ink2); cursor:pointer; user-select:none; font-size:12px; }
   th:hover { color:var(--head); }
   tbody tr:hover { background:var(--row-hover); }
+  .dnr { color:var(--ink2); font-style:italic; opacity:.75; }
   .pb-flag { background:var(--pb); color:white; padding:1px 7px; border-radius:4px; font-size:10px; font-weight:700; }
   .scroll { max-height:380px; overflow-y:auto; }
   footer { text-align:center; color:var(--ink2); font-size:11px; padding:18px; }
@@ -221,6 +222,13 @@ function renderH2H() {
     .map(([date, m]) => ({ date, runs: runners.map((_, i) => m[i]), d: parseDate(date) }))
     .sort((a,b) => a.d - b.d);
 
+  // Every event day either of them ran. The results table lists these so a
+  // solo run still shows up; wins, gaps and the scatter stay on shared days,
+  // since there's nothing to compare against on a day someone sat out.
+  const allDays = Object.entries(byDate)
+    .map(([date, m]) => ({ date, runs: runners.map((_, i) => m[i] || null), d: parseDate(date) }))
+    .sort((a,b) => a.d - b.d);
+
   // Head-to-head wins (assuming 2 runners)
   let wins = [0, 0], closest = null, biggest = null;
   sharedDays.forEach(day => {
@@ -313,8 +321,8 @@ function renderH2H() {
       </div>
     </div>
 
-    ${sharedDays.length ? `
-    <div class="card"><h2>Same-day results (${sharedDays.length})</h2>
+    ${allDays.length ? `
+    <div class="card"><h2>Every parkrun (${allDays.length}) <span style="font-size:11px; color:var(--ink2); font-weight:normal;">· ${sharedDays.length} run together</span></h2>
       <div class="scroll">
         <table>
           <thead><tr>
@@ -324,15 +332,22 @@ function renderH2H() {
             <th>Winner</th>
           </tr></thead>
           <tbody>
-            ${[...sharedDays].reverse().map(day => {
+            ${[...allDays].reverse().map(day => {
               const [a, b] = day.runs;
-              const gap = Math.abs(a.seconds - b.seconds);
-              const winnerIdx = a.seconds < b.seconds ? 0 : 1;
+              const both = a && b;
+              const tie = both && a.seconds === b.seconds;
+              const winnerIdx = both && !tie ? (a.seconds < b.seconds ? 0 : 1) : -1;
+              const verdict = !both
+                ? '<span class="dnr">—</span>'
+                : tie ? '<span class="dnr">dead heat</span>'
+                      : `<span style="color:${COLORS[winnerIdx]}; font-weight:700;">${runners[winnerIdx].short}</span>`;
               return `<tr>
                 <td>${day.date}</td>
-                ${day.runs.map((r,i) => `<td style="font-weight:${i===winnerIdx?'700':'400'};">${r.time}${r.pb?' <span class="pb-flag">PB</span>':''}</td>`).join('')}
-                <td style="font-variant-numeric:tabular-nums;">${fmtTime(gap)}</td>
-                <td style="color:${COLORS[winnerIdx]}; font-weight:700;">${runners[winnerIdx].short}</td>
+                ${day.runs.map((r,i) => r
+                    ? `<td style="font-weight:${i===winnerIdx?'700':'400'};">${r.time}${r.pb?' <span class="pb-flag">PB</span>':''}</td>`
+                    : `<td class="dnr">did not run</td>`).join('')}
+                <td style="font-variant-numeric:tabular-nums;">${both ? fmtTime(Math.abs(a.seconds - b.seconds)) : '<span class="dnr">—</span>'}</td>
+                <td>${verdict}</td>
               </tr>`;
             }).join('')}
           </tbody>
