@@ -43,6 +43,11 @@
     --bar: #2b233d;           /* darkest chart fill — must stay legible on --card */
     /* activity heatmap ramp: no run → light → mid → strong */
     --hm0: #ece8f3; --hm1: #c3b8dc; --hm2: #7460a3; --hm3: #2b233d;
+    /* runner identity as text — the chart hues (#2b233d / #ff4d6d) fail AA as
+       small text, so text gets its own shades. r0 = Lee, r1 = Sally. */
+    --r0-text: #4f3d80; --r1-text: #d6284b;
+    /* the same, on the always-dark purple gradient cards */
+    --r0-on-dark: #cfc3f7; --r1-on-dark: #ff9cae;
   }
   :root[data-theme="light"] { color-scheme: light; }
   :root[data-theme="dark"] {
@@ -55,6 +60,7 @@
       --card-border: #2f2846;
       --bar: #9c89c4;
       --hm0: #241f33; --hm1: #4f3d80; --hm2: #9c89c4; --hm3: #ded4f5;
+      --r0-text: #b9a8f0; --r1-text: #ff6b85;
   }
   * { box-sizing: border-box; }
   body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--ink); line-height:1.5; }
@@ -69,14 +75,33 @@
   .runner-switcher button { background:rgba(255,255,255,.1); color:white; border:1px solid rgba(255,255,255,.25); padding:8px 16px; border-radius:999px; cursor:pointer; font-size:13px; font-weight:600; }
   .runner-switcher button.active { background:white; color:var(--pr-purple); border-color:white; }
   .runner-switcher .theme-btn { margin-left:auto; order:9; font-size:12px; padding:8px 14px; }
+  @media (max-width:520px) {
+    .runner-switcher .theme-btn { padding:8px 11px; }
+    .runner-switcher .theme-btn .tl { display:none; }
+  }
+  .score { font-size:34px; font-weight:800; line-height:1.1; margin:4px 0 2px; font-variant-numeric:tabular-nums; }
+  .score .sep { opacity:.45; margin:0 6px; font-weight:400; }
+  .score-facts { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;
+                 margin-top:14px; padding-top:12px; border-top:1px solid rgba(255,255,255,.16); }
+  .eyebrow { font-size:11px; opacity:.7; text-transform:uppercase; letter-spacing:.5px; }
   main { max-width:1200px; margin:0 auto; padding:16px; }
-  .kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; margin-bottom:16px; }
+  /* 3×2 below 900px, 6×1 above. auto-fit used to leave a lone card on its own
+     row between ~770–920px, and stacked to 3 tall rows on phones. */
+  .kpis { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px; }
+  @media (min-width:900px) { .kpis { grid-template-columns:repeat(6,1fr); } }
   .kpi { background:var(--card); border-radius:12px; padding:14px; box-shadow:0 1px 3px rgba(30,20,60,.08); border:1px solid var(--card-border); border-top:3px solid var(--accent); }
   .kpi .label { font-size:11px; color:var(--ink2); text-transform:uppercase; letter-spacing:.5px; }
   .kpi .val { font-size:22px; font-weight:700; margin-top:4px; }
   .kpi .sub { font-size:11px; color:var(--ink2); margin-top:2px; }
   .kpi.pb { border-top-color:var(--pb); }
   .kpi.accent2 { border-top-color:var(--accent2); }
+  @media (max-width:520px) {
+    .kpis { gap:8px; }
+    .kpi { padding:10px 10px 9px; border-radius:10px; }
+    .kpi .label { font-size:9.5px; letter-spacing:.3px; line-height:1.25; }
+    .kpi .val { font-size:18px; margin-top:3px; }
+    .kpi .sub { font-size:10px; }
+  }
   .grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
   @media (max-width:820px) { .grid { grid-template-columns:1fr; } }
   .card { background:var(--card); border-radius:12px; padding:14px; box-shadow:0 1px 3px rgba(30,20,60,.08); border:1px solid var(--card-border); }
@@ -236,38 +261,61 @@ function renderH2H() {
     if (a.seconds < b.seconds) wins[0]++;
     else if (b.seconds < a.seconds) wins[1]++;
     const gap = Math.abs(a.seconds - b.seconds);
-    if (!closest || gap < closest.gap) closest = { ...day, gap };
+    if (gap > 0 && (!closest || gap < closest.gap)) closest = { ...day, gap };
     if (!biggest || gap > biggest.gap) biggest = { ...day, gap };
   });
 
   document.getElementById('headerName').textContent = runners.map(r => r.short).join('  vs  ');
+  const ties = sharedDays.length - wins[0] - wins[1];
   document.getElementById('headerMeta').textContent =
-    `${sharedDays.length} parkruns run together · ${wins[0]} wins for ${runners[0].short}, ${wins[1]} for ${runners[1].short}`;
+    `${sharedDays.length} parkruns run together · ${allDays.length} between you`;
 
   const app = document.getElementById('app');
 
   // KPI comparison grid
   function cmpRow(label, vals, fmt, better='lower') {
     const nums = vals.map(v => typeof v === 'number' ? v : (v && v.seconds != null ? v.seconds : (v && v.ageGrade != null ? v.ageGrade : (v && v.pos != null ? v.pos : v))));
-    const winner = nums.reduce((bi, n, i) => {
+    let winner = nums.reduce((bi, n, i) => {
       if (better === 'lower') return n < nums[bi] ? i : bi;
       return n > nums[bi] ? i : bi;
     }, 0);
+    if (nums.every(n => n === nums[0])) winner = -1;   // level — nobody wins the row
     return `<tr>
       <td style="color:var(--ink2); font-size:11px; text-transform:uppercase; letter-spacing:.5px;">${label}</td>
-      ${vals.map((v,i) => `<td style="font-weight:${i===winner?'700':'500'}; color:${i===winner?'var(--pb)':'var(--ink)'}; font-variant-numeric:tabular-nums;">
-        ${fmt(v)}${i===winner?' 🏆':''}
+      ${vals.map((v,i) => `<td style="font-weight:${i===winner?'700':'500'}; color:${i===winner?`var(--r${i}-text, var(--ink))`:'var(--ink)'}; font-variant-numeric:tabular-nums;">
+        ${fmt(v)}
       </td>`).join('')}
     </tr>`;
   }
 
   app.innerHTML = `
+    ${sharedDays.length ? `
+    <div class="card" style="background:linear-gradient(135deg,#2b233d,#4f3d80); color:white; margin-bottom:14px; border:0;">
+      <div class="eyebrow">Head-to-head wins · ${sharedDays.length} run together</div>
+      <div class="score">
+        <span style="color:var(--r0-on-dark)">${runners[0].short} ${wins[0]}</span><span class="sep">–</span><span style="color:var(--r1-on-dark)">${wins[1]} ${runners[1].short}</span>
+      </div>
+      <div style="font-size:13px; opacity:.8;">${ties ? `${ties} dead heat${ties === 1 ? '' : 's'}` : 'No dead heats yet'}</div>
+      <div class="score-facts">
+        <div>
+          <div class="eyebrow">Closest finish</div>
+          <div style="font-size:15px; font-weight:600;">${closest ? fmtGap(closest.gap) + ' on ' + closest.date : '—'}</div>
+          <div style="font-size:12px; opacity:.75;">${closest ? closest.runs.map((r,i) => runners[i].short + ' ' + r.time).join(' vs ') : ''}</div>
+        </div>
+        <div>
+          <div class="eyebrow">Biggest gap</div>
+          <div style="font-size:15px; font-weight:600;">${biggest ? fmtTime(biggest.gap) + ' on ' + biggest.date : '—'}</div>
+          <div style="font-size:12px; opacity:.75;">${biggest ? biggest.runs.map((r,i) => runners[i].short + ' ' + r.time).join(' vs ') : ''}</div>
+        </div>
+      </div>
+    </div>` : ''}
+
     <div class="card" style="margin-bottom:14px;">
       <h2>Head-to-head stats</h2>
       <table style="width:100%; font-size:14px;">
         <thead><tr>
           <th></th>
-          ${stats.map((s,i) => `<th style="color:${COLORS[i]}; text-align:left;">${s.short}</th>`).join('')}
+          ${stats.map((s,i) => `<th style="color:var(--r${i}-text, var(--ink2)); text-align:left;">${s.short}</th>`).join('')}
         </tr></thead>
         <tbody>
           ${cmpRow('Total runs', stats.map(s => s.totalRuns), v => v, 'higher')}
@@ -285,29 +333,7 @@ function renderH2H() {
       </table>
     </div>
 
-    ${sharedDays.length ? `
-    <div class="card" style="background:linear-gradient(135deg,#2b233d,#4f3d80); color:white; margin-bottom:14px;">
-      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px;">
-        <div>
-          <div style="font-size:11px; opacity:.7; text-transform:uppercase; letter-spacing:.5px;">Wins</div>
-          <div style="font-size:22px; font-weight:700;">
-            <span style="color:${COLORS[0]==='#2b233d'?'#ffa300':COLORS[0]}">${runners[0].short} ${wins[0]}</span>
-            <span style="opacity:.5;"> — </span>
-            <span style="color:${COLORS[1]}">${wins[1]} ${runners[1].short}</span>
-          </div>
-        </div>
-        <div>
-          <div style="font-size:11px; opacity:.7; text-transform:uppercase; letter-spacing:.5px;">Closest finish</div>
-          <div style="font-size:15px; font-weight:600;">${closest ? closest.gap + 's on ' + closest.date : '—'}</div>
-          <div style="font-size:12px; opacity:.75;">${closest ? closest.runs.map((r,i) => runners[i].short + ' ' + r.time).join(' vs ') : ''}</div>
-        </div>
-        <div>
-          <div style="font-size:11px; opacity:.7; text-transform:uppercase; letter-spacing:.5px;">Biggest gap</div>
-          <div style="font-size:15px; font-weight:600;">${biggest ? fmtTime(biggest.gap) + ' on ' + biggest.date : '—'}</div>
-          <div style="font-size:12px; opacity:.75;">${biggest ? biggest.runs.map((r,i) => runners[i].short + ' ' + r.time).join(' vs ') : ''}</div>
-        </div>
-      </div>
-    </div>` : ''}
+
 
     <div class="card" style="margin-bottom:14px;">
       <h2>Finish time — both runners</h2>
@@ -340,7 +366,7 @@ function renderH2H() {
               const verdict = !both
                 ? '<span class="dnr">—</span>'
                 : tie ? '<span class="dnr">dead heat</span>'
-                      : `<span style="color:${COLORS[winnerIdx]}; font-weight:700;">${runners[winnerIdx].short}</span>`;
+                      : `<span style="color:var(--r${winnerIdx}-text, var(--ink)); font-weight:700;">${runners[winnerIdx].short}</span>`;
               return `<tr>
                 <td>${day.date}</td>
                 ${day.runs.map((r,i) => r
@@ -474,11 +500,17 @@ function render() {
     })
     .find(Boolean);
 
-  function chip(deltaSec, label) {
+  // Within ±10s of the comparison is noise on a 5k, so it reads as neutral
+  // "on par" rather than painting a 4-second wobble red.
+  const ON_PAR = 10;
+  function chip(deltaSec, what) {
     if (deltaSec == null) return '';
     const v = Math.round(deltaSec);
-    if (v === 0) return `<span class="chip">level ${label}</span>`;
-    return `<span class="chip ${v < 0 ? 'faster' : 'slower'}">${v < 0 ? '−' : '+'}${fmtTime(Math.abs(v))} ${label}</span>`;
+    const signed = (v < 0 ? '−' : '+') + fmtTime(Math.abs(v));
+    if (Math.abs(v) <= ON_PAR) {
+      return `<span class="chip">on par with ${what}${v ? ` <span style="opacity:.7">(${signed})</span>` : ''}</span>`;
+    }
+    return `<span class="chip ${v < 0 ? 'faster' : 'slower'}">${signed} vs ${what}</span>`;
   }
   const wx = latest.weather;
   const wxIcon = !wx ? '' : wx.rain >= 4 ? '🌧' : wx.rain >= 0.2 ? '🌦' : wx.tmax >= 20 ? '☀️' : wx.tmax <= 4 ? '🥶' : '⛅';
@@ -496,8 +528,8 @@ function render() {
         </div>
       </div>
       <div class="hero-chips">
-        ${prevRun ? chip(latest.seconds - prevRun.seconds, 'vs last run') : ''}
-        ${chip(yearAvg == null ? null : latest.seconds - yearAvg, 'vs 12-mo avg')}
+        ${prevRun ? chip(latest.seconds - prevRun.seconds, 'last run') : ''}
+        ${chip(yearAvg == null ? null : latest.seconds - yearAvg, '12-mo avg')}
         ${isPB ? '' : `<span class="chip">${fmtTime(latest.seconds - pb.seconds)} off PB (${pb.time})</span>`}
         ${wx ? `<span class="chip">${wxIcon} ${wx.tmax}°C · ${wx.rain}mm rain · ${Math.round(wx.wind)} km/h</span>` : ''}
       </div>
@@ -945,9 +977,9 @@ function render() {
 // Theme toggle: Auto → Light → Dark → Auto. Canvas colours are baked in at
 // draw time, so any change has to redraw the active view.
 const THEMES = [
-  { mode: 'system', label: '◐ Auto',  title: 'Theme: following your device' },
-  { mode: 'light',  label: '☀️ Light', title: 'Theme: always light' },
-  { mode: 'dark',   label: '🌙 Dark',  title: 'Theme: always dark' },
+  { mode: 'system', icon: '◐',  label: 'Auto',  title: 'Theme: following your device' },
+  { mode: 'light',  icon: '☀️', label: 'Light', title: 'Theme: always light' },
+  { mode: 'dark',   icon: '🌙', label: 'Dark',  title: 'Theme: always dark' },
 ];
 const prefersDark = matchMedia('(prefers-color-scheme: dark)');
 const themeBtn = document.getElementById('themeBtn');
@@ -957,7 +989,7 @@ function applyTheme(redraw) {
   const dark = themeMode === 'dark' || (themeMode === 'system' && prefersDark.matches);
   document.documentElement.dataset.theme = dark ? 'dark' : 'light';
   const t = THEMES.find(x => x.mode === themeMode);
-  themeBtn.textContent = t.label;
+  themeBtn.innerHTML = `<span class="ti">${t.icon}</span><span class="tl"> ${t.label}</span>`;
   themeBtn.title = t.title;
   themeBtn.setAttribute('aria-label', t.title);
   syncTheme();
