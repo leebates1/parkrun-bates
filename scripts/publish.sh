@@ -93,6 +93,15 @@ if git diff --quiet -- docs/index.html || ! results_changed; then
   result uptodate "$(latest_summary)"
 fi
 
+# Never publish a page that doesn't render. On failure, put back the last
+# good page so the working tree stays clean for next time.
+smoke="$("$PY" scripts/smoke_test.py docs/index.html 2>&1)"; rc=$?
+print -r -- "$smoke" | sed 's/^/    /'
+if [[ $rc -ne 0 ]]; then
+  git checkout -- docs/index.html 2>/dev/null
+  die "the new page failed its safety check, so nothing was published — see the log"
+fi
+
 git add docs/index.html
 git commit -q -m "chore: weekly dashboard update" || die "commit failed"
 git push --quiet origin main 2>&1 | sed 's/^/    /' \
