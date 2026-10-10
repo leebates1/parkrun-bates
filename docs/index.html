@@ -12,6 +12,9 @@
 <link rel="apple-touch-icon" sizes="120x120" href="/parkrun-bates/icon-180.png">
 <link rel="apple-touch-icon-precomposed" href="/parkrun-bates/icon-180.png">
 <link rel="manifest" href="/parkrun-bates/manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&display=swap">
 <meta name="apple-mobile-web-app-title" content="BATES parkrun">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -48,7 +51,10 @@
     --r0-text: #4f3d80; --r1-text: #d6284b;
     /* the same, on the always-dark purple gradient cards */
     --r0-on-dark: #cfc3f7; --r1-on-dark: #ff9cae;
+    /* scoreboard face for headline numbers only; body text stays system */
+    --font-display: 'Barlow Condensed', 'Arial Narrow', 'Roboto Condensed', system-ui, sans-serif;
   }
+  .display { font-family:var(--font-display); font-variant-numeric:tabular-nums; letter-spacing:.3px; }
   :root[data-theme="light"] { color-scheme: light; }
   :root[data-theme="dark"] {
       color-scheme: dark;
@@ -79,7 +85,7 @@
     .runner-switcher .theme-btn { padding:8px 11px; }
     .runner-switcher .theme-btn .tl { display:none; }
   }
-  .score { font-size:34px; font-weight:800; line-height:1.1; margin:4px 0 2px; font-variant-numeric:tabular-nums; }
+  .score { font-family:var(--font-display); font-size:48px; font-weight:700; line-height:1; margin:6px 0 4px; font-variant-numeric:tabular-nums; letter-spacing:.3px; }
   .score .sep { opacity:.45; margin:0 6px; font-weight:400; }
   .score-facts { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;
                  margin-top:14px; padding-top:12px; border-top:1px solid rgba(255,255,255,.16); }
@@ -91,7 +97,7 @@
   @media (min-width:900px) { .kpis { grid-template-columns:repeat(6,1fr); } }
   .kpi { background:var(--card); border-radius:12px; padding:14px; box-shadow:0 1px 3px rgba(30,20,60,.08); border:1px solid var(--card-border); border-top:3px solid var(--accent); }
   .kpi .label { font-size:11px; color:var(--ink2); text-transform:uppercase; letter-spacing:.5px; }
-  .kpi .val { font-size:22px; font-weight:700; margin-top:4px; }
+  .kpi .val { font-family:var(--font-display); font-size:30px; font-weight:700; line-height:1.05; margin-top:4px; font-variant-numeric:tabular-nums; letter-spacing:.3px; }
   .kpi .sub { font-size:11px; color:var(--ink2); margin-top:2px; }
   .kpi.pb { border-top-color:var(--pb); }
   .kpi.accent2 { border-top-color:var(--accent2); }
@@ -99,7 +105,7 @@
     .kpis { gap:8px; }
     .kpi { padding:10px 10px 9px; border-radius:10px; }
     .kpi .label { font-size:9.5px; letter-spacing:.3px; line-height:1.25; }
-    .kpi .val { font-size:18px; margin-top:3px; }
+    .kpi .val { font-size:24px; margin-top:3px; }
     .kpi .sub { font-size:10px; }
   }
   .grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
@@ -125,11 +131,11 @@
   .hero { background:linear-gradient(135deg,#2b233d,#4f3d80); color:#fff; border-radius:12px; padding:16px; margin-bottom:14px; box-shadow:0 2px 10px rgba(30,20,60,.20); }
   .hero-top { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap; }
   .hero-label { font-size:11px; text-transform:uppercase; letter-spacing:.6px; opacity:.75; }
-  .hero-time { font-size:38px; font-weight:800; line-height:1.05; margin-top:2px; font-variant-numeric:tabular-nums; }
+  .hero-time { font-family:var(--font-display); font-size:60px; font-weight:700; line-height:.95; margin-top:4px; font-variant-numeric:tabular-nums; letter-spacing:.5px; }
   .hero-sub { font-size:12px; opacity:.8; margin-top:4px; }
   .hero-figs { display:flex; gap:20px; }
   .hero-figs > div { text-align:right; }
-  .hero-figs b { display:block; font-size:20px; font-weight:700; font-variant-numeric:tabular-nums; }
+  .hero-figs b { display:block; font-family:var(--font-display); font-size:30px; font-weight:700; line-height:1.05; font-variant-numeric:tabular-nums; letter-spacing:.3px; }
   .hero-figs span { font-size:10px; text-transform:uppercase; letter-spacing:.5px; opacity:.7; }
   .hero-chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:14px; }
   .chip { background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.18); border-radius:999px; padding:4px 10px; font-size:11.5px; font-weight:600; font-variant-numeric:tabular-nums; }
@@ -137,7 +143,92 @@
   .chip.slower { background:rgba(255,143,163,.16); border-color:rgba(255,143,163,.38); color:#ffc9d2; }
   .hero-pb { background:var(--pb); color:#fff; font-size:12px; font-weight:800; padding:3px 9px; border-radius:999px; vertical-align:middle; margin-left:8px; letter-spacing:.5px; }
   .hero-vs { margin-top:12px; padding-top:10px; border-top:1px solid rgba(255,255,255,.16); font-size:13px; }
-  @media (max-width:480px) { .hero-time { font-size:32px; } .hero-figs { gap:14px; } }
+  /* year wrapped */
+  .wrapped-banner { display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; border:0; cursor:pointer;
+    text-align:left; font:inherit; background:linear-gradient(90deg,#ffa300,#ff4d6d); color:#1b1730; border-radius:12px;
+    padding:12px 16px; margin-bottom:14px; box-shadow:0 2px 10px rgba(255,77,109,.25); }
+  .wrapped-banner b { font-family:var(--font-display); font-size:22px; font-weight:700; letter-spacing:.3px; }
+  .wrapped-banner span { font-size:13px; font-weight:600; }
+  .wrapped { position:fixed; inset:0; z-index:100; color:#fff; display:flex; flex-direction:column;
+    padding:max(14px, env(safe-area-inset-top)) 18px max(16px, env(safe-area-inset-bottom));
+    background:radial-gradient(120% 90% at 85% 0%, #6b4aa8 0%, transparent 55%), linear-gradient(165deg,#1b1530 0%,#2b233d 45%,#3d2d66 100%); }
+  .wrapped[hidden] { display:none; }   /* author display:flex would otherwise beat the UA [hidden] rule */
+  .w-top { display:flex; align-items:center; gap:12px; max-width:600px; width:100%; margin:0 auto; }
+  .w-bars { display:flex; gap:4px; flex:1; }
+  .w-bars i { flex:1; height:3px; border-radius:2px; background:rgba(255,255,255,.22); }
+  .w-bars i.on { background:#fff; }
+  .w-close { background:rgba(255,255,255,.12); color:#fff; border:0; width:34px; height:34px; border-radius:50%; font-size:20px; line-height:1; cursor:pointer; }
+  .w-stage { flex:1; display:flex; align-items:center; justify-content:center; cursor:pointer; user-select:none; -webkit-user-select:none; padding:14px 0; }
+  .w-card { max-width:600px; width:100%; }
+  .w-enter { animation:wIn .35s ease both; }
+  @keyframes wIn { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
+  @media (prefers-reduced-motion: reduce) { .w-enter { animation:none; } }
+  .w-eyebrow { font-size:12px; font-weight:600; letter-spacing:1px; text-transform:uppercase; opacity:.7; }
+  .w-big { font-family:var(--font-display); font-size:clamp(72px, 22vw, 136px); font-weight:700; line-height:.88; letter-spacing:.5px; }
+  .w-mid { font-family:var(--font-display); font-size:clamp(36px, 10vw, 56px); font-weight:700; line-height:1; letter-spacing:.3px; }
+  .w-text { font-size:16px; line-height:1.5; opacity:.92; margin-top:12px; }
+  .w-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:20px; }
+  .w-tile { background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12); border-radius:14px; padding:14px; }
+  .w-tile .w-mid { font-size:clamp(30px, 8.5vw, 44px); }
+  .w-name { font-size:12px; font-weight:700; letter-spacing:.6px; text-transform:uppercase; }
+  .w-sub { font-size:13px; opacity:.75; margin-top:4px; line-height:1.4; }
+  .w-list { margin-top:16px; display:grid; gap:8px; }
+  .w-list div { display:flex; justify-content:space-between; gap:10px; font-size:14px; padding:8px 12px; border-radius:10px; background:rgba(255,255,255,.07); }
+  .w-months { display:grid; grid-template-columns:repeat(12,1fr); gap:5px; align-items:end; height:130px; margin-top:22px; }
+  .w-months div { display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; gap:4px; font-size:10px; opacity:.85; }
+  .w-months b { width:100%; border-radius:4px 4px 0 0; background:rgba(255,255,255,.28); min-height:2px; }
+  .w-months .peak b { background:#ffa300; }
+  .w-months .future { opacity:.3; }   /* not happened yet, not a gap */
+  .w-years { display:flex; gap:6px; flex-wrap:wrap; margin-top:22px; }
+  .w-years button { background:rgba(255,255,255,.1); color:#fff; border:1px solid rgba(255,255,255,.2); border-radius:999px; padding:6px 12px; font:inherit; font-size:13px; font-weight:600; cursor:pointer; }
+  .w-years button.on { background:#fff; color:#2b233d; }
+  .w-nav { display:flex; justify-content:space-between; align-items:center; max-width:600px; width:100%; margin:0 auto; font-size:12px; opacity:.75; }
+  .w-nav button { background:rgba(255,255,255,.12); color:#fff; border:0; border-radius:999px; padding:8px 14px; font:inherit; font-weight:600; cursor:pointer; }
+  .w-nav button:disabled { opacity:.3; cursor:default; }
+  body.w-open { overflow:hidden; }
+
+  /* race replay */
+  .replay-head { display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px; }
+  .replay-head h2 { margin:0; }
+  .replay-head .controls { margin:0; align-items:center; }
+  .replay select.btn { padding:4px 8px; max-width:150px; }
+  .lane { display:grid; grid-template-columns:50px 1fr 58px; align-items:center; gap:12px; height:36px; }
+  .lane-name { font-weight:700; font-size:13px; }
+  .lane-line { position:relative; height:10px; border-radius:999px; background-color:var(--bg); border:1px solid var(--line);
+    background-image:repeating-linear-gradient(90deg, transparent 0 calc(20% - 1px), var(--line) calc(20% - 1px) 20%); }
+  .lane-line::after { content:''; position:absolute; right:-3px; top:-7px; bottom:-7px; width:6px; border-radius:1px;
+    background:conic-gradient(var(--ink) 25%, var(--card) 0 50%, var(--ink) 0 75%, var(--card) 0) 0 0 / 6px 6px; }
+  .runner { position:absolute; top:50%; left:0; width:18px; height:18px; margin:-9px 0 0 -9px; border-radius:50%;
+    border:2px solid var(--card); box-shadow:0 1px 4px rgba(0,0,0,.3); z-index:1; }
+  .lane-time { font-family:var(--font-display); font-size:22px; font-weight:700; text-align:right; font-variant-numeric:tabular-nums; }
+  .lane.kms { height:16px; }
+  .lane.kms .lane-line { background:none; border:0; height:14px; }
+  .lane.kms .lane-line::after { display:none; }
+  .lane.kms .lane-line span { position:absolute; top:0; transform:translateX(-50%); font-size:10px; color:var(--ink2); }
+  .replay-foot { display:flex; align-items:center; gap:14px; margin-top:12px; flex-wrap:wrap; }
+  .play { background:var(--btn-on); color:#fff; border:0; border-radius:999px; padding:9px 16px; font-weight:700; font-size:13px; cursor:pointer; }
+  .replay-clock { font-size:36px; font-weight:700; line-height:1; min-width:84px; }
+  .replay-status { font-size:13px; flex:1; min-width:200px; }
+  .replay-note { font-size:11px; color:var(--ink2); margin-top:10px; }
+  @media (max-width:480px) { .lane { grid-template-columns:42px 1fr 52px; gap:10px; } .lane-time { font-size:19px; } }
+
+  /* season rings */
+  .rings-wrap { display:grid; grid-template-columns:minmax(0,440px) 1fr; gap:24px; align-items:center; }
+  @media (max-width:700px) { .rings-wrap { grid-template-columns:1fr; gap:14px; } }
+  .rings { width:100%; height:auto; display:block; max-width:440px; margin:0 auto; }
+  .rings circle { transition:r .15s; }
+  .ring-month { font-size:12px; font-weight:600; fill:var(--ink2); }
+  .ring-year { font-size:9px; font-weight:600; fill:var(--ink2); }
+  .ring-total { font-family:var(--font-display); font-size:44px; font-weight:700; fill:var(--ink); }
+  .ring-sub { font-size:11px; fill:var(--ink2); }
+  .rings-note .fact { padding:10px 0; border-bottom:1px solid var(--line); }
+  .rings-note .fact:last-of-type { border-bottom:0; }
+  .rings-note .big { font-family:var(--font-display); font-size:30px; font-weight:700; line-height:1; }
+  .rings-note .what { font-size:12px; color:var(--ink2); margin-top:3px; }
+  .rings-legend { display:flex; flex-wrap:wrap; gap:10px; margin-top:10px; font-size:11px; color:var(--ink2); }
+  .rings-legend span { display:inline-flex; align-items:center; gap:5px; }
+  .rings-legend i { width:10px; height:10px; border-radius:50%; display:inline-block; }
+  @media (max-width:480px) { .hero-time { font-size:52px; } .hero-figs { gap:14px; } .hero-figs b { font-size:26px; } .score { font-size:42px; } }
 </style>
 </head>
 <body>
@@ -158,8 +249,14 @@
   <a href="https://github.com/leebates1/parkrun-bates">source</a>
 </footer>
 
+<div class="wrapped" id="wrapped" role="dialog" aria-modal="true" aria-label="Year wrapped" hidden>
+  <div class="w-top"><div class="w-bars" id="wBars"></div><button class="w-close" id="wClose" type="button" aria-label="Close">×</button></div>
+  <div class="w-stage" id="wStage"><div class="w-card" id="wCard"></div></div>
+  <div class="w-nav"><button id="wPrev" type="button">‹ Back</button><span id="wCount"></span><button id="wNext" type="button">Next ›</button></div>
+</div>
+
 <script>
-const PAYLOAD = {"generatedAt": "2026-10-10T09:48:44.939006+00:00", "event": "widnes", "runners": [{"id": "7959573", "name": "Lee BATES", "totalRuns": 128, "homeRuns": 128, "homeEvent": "Widnes", "ageCat": "VM40-44", "club100": false, "club250": false, "club500": false, "results": [{"date": "10/10/2026", "run": 529, "pos": 275, "time": "32:14", "ageGrade": 42.97, "pb": false, "weather": {"temp": 10.9, "rain": 0.2, "wind": 25.6, "gust": 55.1}}, {"date": "26/09/2026", "run": 527, "pos": 316, "time": "34:30", "ageGrade": 40.14, "pb": false, "weather": {"temp": 11.3, "rain": 0.0, "wind": 10.9, "gust": 23.0}}, {"date": "05/09/2026", "run": 524, "pos": 319, "time": "34:06", "ageGrade": 40.62, "pb": false, "weather": {"temp": 14.8, "rain": 0.1, "wind": 16.1, "gust": 37.4}}, {"date": "29/08/2026", "run": 523, "pos": 370, "time": "37:08", "ageGrade": 37.3, "pb": false, "weather": {"temp": 16.0, "rain": 0.2, "wind": 11.4, "gust": 25.6}}, {"date": "15/08/2026", "run": 521, "pos": 316, "time": "35:04", "ageGrade": 39.21, "pb": false, "weather": {"temp": 17.6, "rain": 0.0, "wind": 13.6, "gust": 32.8}}, {"date": "20/06/2026", "run": 513, "pos": 384, "time": "34:00", "ageGrade": 40.44, "pb": false, "weather": {"temp": 17.8, "rain": 0.0, "wind": 11.3, "gust": 30.6}}, {"date": "13/06/2026", "run": 512, "pos": 259, "time": "30:23", "ageGrade": 45.26, "pb": false, "weather": {"temp": 13.4, "rain": 0.1, "wind": 27.2, "gust": 60.8}}, {"date": "06/06/2026", "run": 511, "pos": 340, "time": "30:23", "ageGrade": 45.26, "pb": false, "weather": {"temp": 13.4, "rain": 0.1, "wind": 25.4, "gust": 61.6}}, {"date": "30/05/2026", "run": 510, "pos": 298, "time": "32:17", "ageGrade": 42.59, "pb": false, "weather": {"temp": 15.2, "rain": 0.0, "wind": 4.1, "gust": 16.6}}, {"date": "23/05/2026", "run": 509, "pos": 340, "time": "33:00", "ageGrade": 41.67, "pb": false, "weather": {"temp": 15.3, "rain": 0.1, "wind": 8.6, "gust": 23.8}}, {"date": "16/05/2026", "run": 508, "pos": 403, "time": "32:21", "ageGrade": 42.5, "pb": false, "weather": {"temp": 9.6, "rain": 0.1, "wind": 8.0, "gust": 20.9}}, {"date": "02/05/2026", "run": 507, "pos": 329, "time": "31:23", "ageGrade": 43.81, "pb": false, "weather": {"temp": 11.3, "rain": 0.0, "wind": 4.3, "gust": 16.2}}, {"date": "25/04/2026", "run": 506, "pos": 302, "time": "32:02", "ageGrade": 42.92, "pb": false, "weather": {"temp": 9.1, "rain": 0.0, "wind": 3.3, "gust": 13.3}}, {"date": "18/04/2026", "run": 505, "pos": 301, "time": "31:41", "ageGrade": 43.4, "pb": false, "weather": {"temp": 10.1, "rain": 0.0, "wind": 17.9, "gust": 40.0}}, {"date": "11/04/2026", "run": 504, "pos": 334, "time": "31:46", "ageGrade": 43.28, "pb": false, "weather": {"temp": 5.8, "rain": 0.0, "wind": 14.1, "gust": 29.9}}, {"date": "04/04/2026", "run": 503, "pos": 338, "time": "32:16", "ageGrade": 42.61, "pb": false, "weather": {"temp": 6.9, "rain": 0.0, "wind": 9.5, "gust": 21.6}}, {"date": "28/03/2026", "run": 502, "pos": 342, "time": "32:49", "ageGrade": 41.9, "pb": false, "weather": {"temp": 5.1, "rain": 0.4, "wind": 21.2, "gust": 54.7}}, {"date": "21/03/2026", "run": 501, "pos": 360, "time": "34:18", "ageGrade": 40.09, "pb": false, "weather": {"temp": 4.8, "rain": 0.0, "wind": 1.6, "gust": 9.4}}, {"date": "14/03/2026", "run": 500, "pos": 463, "time": "33:07", "ageGrade": 41.52, "pb": false, "weather": {"temp": 4.9, "rain": 0.0, "wind": 9.0, "gust": 17.6}}, {"date": "07/03/2026", "run": 499, "pos": 245, "time": "30:08", "ageGrade": 45.63, "pb": false, "weather": {"temp": 5.1, "rain": 0.0, "wind": 4.5, "gust": 12.2}}, {"date": "28/02/2026", "run": 498, "pos": 313, "time": "30:21", "ageGrade": 45.3, "pb": false, "weather": {"temp": 5.5, "rain": 0.2, "wind": 9.2, "gust": 19.8}}, {"date": "07/02/2026", "run": 495, "pos": 241, "time": "28:57", "ageGrade": 47.5, "pb": false, "weather": {"temp": 5.3, "rain": 0.0, "wind": 13.9, "gust": 28.4}}, {"date": "31/01/2026", "run": 494, "pos": 227, "time": "29:40", "ageGrade": 46.35, "pb": false, "weather": {"temp": 6.8, "rain": 0.0, "wind": 19.4, "gust": 44.3}}, {"date": "13/12/2025", "run": 486, "pos": 175, "time": "28:56", "ageGrade": 47.52, "pb": true, "weather": {"temp": 4.3, "rain": 0.0, "wind": 13.5, "gust": 27.4}}, {"date": "06/12/2025", "run": 485, "pos": 219, "time": "33:10", "ageGrade": 41.46, "pb": false, "weather": {"temp": 7.9, "rain": 0.0, "wind": 12.2, "gust": 26.3}}, {"date": "29/11/2025", "run": 484, "pos": 176, "time": "29:37", "ageGrade": 46.43, "pb": true, "weather": {"temp": 4.9, "rain": 0.0, "wind": 0.8, "gust": 4.3}}, {"date": "25/10/2025", "run": 480, "pos": 237, "time": "30:35", "ageGrade": 44.96, "pb": false, "weather": {"temp": 8.9, "rain": 0.0, "wind": 16.2, "gust": 35.3}}, {"date": "11/10/2025", "run": 478, "pos": 252, "time": "34:45", "ageGrade": 39.57, "pb": false, "weather": {"temp": 11.8, "rain": 0.0, "wind": 4.0, "gust": 10.1}}, {"date": "27/09/2025", "run": 476, "pos": 226, "time": "30:19", "ageGrade": 45.35, "pb": false, "weather": {"temp": 11.0, "rain": 0.0, "wind": 12.1, "gust": 30.2}}, {"date": "20/09/2025", "run": 475, "pos": 266, "time": "32:43", "ageGrade": 42.03, "pb": false, "weather": {"temp": 15.5, "rain": 1.2, "wind": 5.4, "gust": 14.4}}, {"date": "13/09/2025", "run": 474, "pos": 301, "time": "33:47", "ageGrade": 40.7, "pb": false, "weather": {"temp": 11.6, "rain": 0.0, "wind": 10.8, "gust": 27.0}}, {"date": "30/08/2025", "run": 472, "pos": 315, "time": "34:16", "ageGrade": 40.13, "pb": false, "weather": {"temp": 15.3, "rain": 0.0, "wind": 12.8, "gust": 32.0}}, {"date": "02/08/2025", "run": 468, "pos": 314, "time": "34:26", "ageGrade": 39.64, "pb": false, "weather": {"temp": 15.7, "rain": 0.0, "wind": 14.6, "gust": 34.6}}, {"date": "26/07/2025", "run": 467, "pos": 315, "time": "35:05", "ageGrade": 38.91, "pb": false, "weather": {"temp": 17.7, "rain": 0.1, "wind": 11.8, "gust": 30.6}}, {"date": "05/07/2025", "run": 464, "pos": 247, "time": "31:07", "ageGrade": 43.87, "pb": false, "weather": {"temp": 17.8, "rain": 0.1, "wind": 17.6, "gust": 40.0}}, {"date": "31/05/2025", "run": 459, "pos": 405, "time": "38:22", "ageGrade": 35.58, "pb": false, "weather": {"temp": 17.0, "rain": 0.0, "wind": 17.4, "gust": 40.7}}, {"date": "10/05/2025", "run": 456, "pos": 228, "time": "29:39", "ageGrade": 46.04, "pb": true, "weather": {"temp": 13.2, "rain": 0.0, "wind": 4.8, "gust": 18.7}}, {"date": "03/05/2025", "run": 455, "pos": 251, "time": "30:11", "ageGrade": 45.22, "pb": false, "weather": {"temp": 12.1, "rain": 0.0, "wind": 18.6, "gust": 42.8}}, {"date": "26/04/2025", "run": 454, "pos": 264, "time": "30:26", "ageGrade": 44.85, "pb": false, "weather": {"temp": 10.4, "rain": 0.1, "wind": 9.9, "gust": 24.5}}, {"date": "19/04/2025", "run": 453, "pos": 326, "time": "34:24", "ageGrade": 39.68, "pb": false, "weather": {"temp": 9.8, "rain": 0.0, "wind": 16.1, "gust": 39.2}}, {"date": "15/02/2025", "run": 444, "pos": 209, "time": "31:37", "ageGrade": 43.17, "pb": false, "weather": {"temp": 3.1, "rain": 0.0, "wind": 10.0, "gust": 23.0}}, {"date": "08/02/2025", "run": 443, "pos": 207, "time": "29:55", "ageGrade": 45.63, "pb": true, "weather": {"temp": 1.6, "rain": 0.0, "wind": 9.2, "gust": 18.7}}, {"date": "18/01/2025", "run": 441, "pos": 239, "time": "31:17", "ageGrade": 43.63, "pb": false, "weather": {"temp": 1.6, "rain": 0.0, "wind": 10.9, "gust": 23.0}}, {"date": "04/01/2025", "run": 440, "pos": 314, "time": "32:45", "ageGrade": 41.68, "pb": false, "weather": {"temp": 0.4, "rain": 0.0, "wind": 6.8, "gust": 14.4}}, {"date": "28/12/2024", "run": 439, "pos": 298, "time": "34:15", "ageGrade": 39.85, "pb": false, "weather": {"temp": 4.5, "rain": 0.0, "wind": 3.8, "gust": 10.1}}, {"date": "14/12/2024", "run": 436, "pos": 206, "time": "36:36", "ageGrade": 37.3, "pb": false, "weather": {"temp": 5.1, "rain": 0.0, "wind": 9.8, "gust": 22.7}}, {"date": "23/11/2024", "run": 434, "pos": 204, "time": "31:36", "ageGrade": 43.2, "pb": false, "weather": {"temp": 4.4, "rain": 1.6, "wind": 34.6, "gust": 68.8}}, {"date": "16/11/2024", "run": 433, "pos": 294, "time": "30:56", "ageGrade": 44.13, "pb": true, "weather": {"temp": 11.3, "rain": 0.8, "wind": 15.3, "gust": 37.1}}, {"date": "09/11/2024", "run": 432, "pos": 261, "time": "32:46", "ageGrade": 41.66, "pb": false, "weather": {"temp": 5.7, "rain": 0.0, "wind": 5.8, "gust": 11.5}}, {"date": "12/10/2024", "run": 428, "pos": 299, "time": "34:39", "ageGrade": 39.39, "pb": false, "weather": {"temp": 7.0, "rain": 0.0, "wind": 7.5, "gust": 14.8}}, {"date": "05/10/2024", "run": 427, "pos": 278, "time": "34:38", "ageGrade": 39.41, "pb": false, "weather": {"temp": 9.0, "rain": 0.0, "wind": 15.7, "gust": 30.6}}, {"date": "21/09/2024", "run": 425, "pos": 306, "time": "34:40", "ageGrade": 39.38, "pb": false, "weather": {"temp": 14.8, "rain": 0.0, "wind": 23.6, "gust": 43.9}}, {"date": "14/09/2024", "run": 424, "pos": 259, "time": "33:32", "ageGrade": 40.71, "pb": false, "weather": {"temp": 13.7, "rain": 0.0, "wind": 11.9, "gust": 26.3}}, {"date": "07/09/2024", "run": 423, "pos": 285, "time": "36:06", "ageGrade": 37.81, "pb": false, "weather": {"temp": 17.3, "rain": 0.0, "wind": 15.3, "gust": 33.1}}, {"date": "24/08/2024", "run": 421, "pos": 267, "time": "34:13", "ageGrade": 39.89, "pb": false, "weather": {"temp": 14.4, "rain": 0.2, "wind": 15.4, "gust": 31.0}}, {"date": "10/08/2024", "run": 419, "pos": 300, "time": "32:58", "ageGrade": 41.1, "pb": false, "weather": {"temp": 17.2, "rain": 0.1, "wind": 13.1, "gust": 24.1}}, {"date": "03/08/2024", "run": 418, "pos": 235, "time": "34:23", "ageGrade": 39.41, "pb": false, "weather": {"temp": 16.0, "rain": 0.0, "wind": 16.9, "gust": 32.0}}, {"date": "27/07/2024", "run": 417, "pos": 250, "time": "33:54", "ageGrade": 39.97, "pb": false, "weather": {"temp": 15.6, "rain": 0.0, "wind": 11.1, "gust": 24.1}}, {"date": "20/07/2024", "run": 416, "pos": 278, "time": "35:54", "ageGrade": 37.74, "pb": false, "weather": {"temp": 19.2, "rain": 0.0, "wind": 10.8, "gust": 22.3}}, {"date": "13/07/2024", "run": 415, "pos": 306, "time": "34:05", "ageGrade": 39.76, "pb": false, "weather": {"temp": 14.8, "rain": 0.2, "wind": 15.2, "gust": 28.8}}, {"date": "06/07/2024", "run": 414, "pos": 232, "time": "36:52", "ageGrade": 36.75, "pb": false, "weather": {"temp": 11.8, "rain": 0.5, "wind": 15.3, "gust": 31.0}}, {"date": "15/06/2024", "run": 411, "pos": 290, "time": "34:23", "ageGrade": 39.41, "pb": false, "weather": {"temp": 12.5, "rain": 0.0, "wind": 7.8, "gust": 21.2}}, {"date": "08/06/2024", "run": 410, "pos": 427, "time": "41:05", "ageGrade": 32.98, "pb": false, "weather": {"temp": 11.1, "rain": 0.0, "wind": 23.5, "gust": 45.0}}, {"date": "25/05/2024", "run": 408, "pos": 330, "time": "38:00", "ageGrade": 35.66, "pb": false, "weather": {"temp": 13.4, "rain": 0.0, "wind": 7.8, "gust": 19.8}}, {"date": "18/05/2024", "run": 407, "pos": 305, "time": "35:26", "ageGrade": 38.24, "pb": false, "weather": {"temp": 14.9, "rain": 0.0, "wind": 6.5, "gust": 16.9}}, {"date": "11/05/2024", "run": 406, "pos": 303, "time": "35:10", "ageGrade": 38.53, "pb": false, "weather": {"temp": 16.7, "rain": 0.0, "wind": 12.1, "gust": 26.3}}, {"date": "04/05/2024", "run": 405, "pos": 300, "time": "34:18", "ageGrade": 39.5, "pb": false, "weather": {"temp": 10.6, "rain": 0.1, "wind": 12.3, "gust": 22.7}}, {"date": "27/04/2024", "run": 404, "pos": 301, "time": "35:09", "ageGrade": 38.55, "pb": false, "weather": {"temp": 7.4, "rain": 0.0, "wind": 17.6, "gust": 34.9}}, {"date": "20/04/2024", "run": 403, "pos": 304, "time": "36:10", "ageGrade": 37.47, "pb": false, "weather": {"temp": 7.5, "rain": 0.0, "wind": 3.8, "gust": 13.7}}, {"date": "13/04/2024", "run": 402, "pos": 403, "time": "36:51", "ageGrade": 36.77, "pb": false, "weather": {"temp": 12.9, "rain": 0.0, "wind": 19.9, "gust": 38.2}}, {"date": "30/03/2024", "run": 400, "pos": 395, "time": "40:45", "ageGrade": 33.25, "pb": false, "weather": {"temp": 6.7, "rain": 0.0, "wind": 13.4, "gust": 27.4}}, {"date": "23/03/2024", "run": 399, "pos": 263, "time": "38:18", "ageGrade": 35.38, "pb": false, "weather": {"temp": 4.4, "rain": 2.0, "wind": 32.5, "gust": 64.1}}, {"date": "16/03/2024", "run": 398, "pos": 355, "time": "48:11", "ageGrade": 28.12, "pb": false, "weather": {"temp": 3.3, "rain": 0.0, "wind": 10.5, "gust": 23.4}}, {"date": "09/03/2024", "run": 397, "pos": 272, "time": "34:51", "ageGrade": 38.88, "pb": false, "weather": {"temp": 5.4, "rain": 0.1, "wind": 28.1, "gust": 48.6}}, {"date": "02/03/2024", "run": 396, "pos": 299, "time": "35:15", "ageGrade": 38.44, "pb": false, "weather": {"temp": 1.2, "rain": 0.0, "wind": 12.4, "gust": 23.0}}, {"date": "24/02/2024", "run": 395, "pos": 396, "time": "36:42", "ageGrade": 36.92, "pb": false, "weather": {"temp": -0.2, "rain": 0.0, "wind": 6.8, "gust": 15.1}}, {"date": "17/02/2024", "run": 394, "pos": 309, "time": "36:54", "ageGrade": 36.72, "pb": false, "weather": {"temp": 9.6, "rain": 0.0, "wind": 12.0, "gust": 21.2}}, {"date": "10/02/2024", "run": 393, "pos": 365, "time": "39:50", "ageGrade": 34.02, "pb": false, "weather": {"temp": 4.7, "rain": 0.0, "wind": 9.7, "gust": 18.0}}, {"date": "03/02/2024", "run": 392, "pos": 341, "time": "42:11", "ageGrade": 32.12, "pb": false, "weather": {"temp": 10.9, "rain": 0.0, "wind": 29.9, "gust": 53.6}}, {"date": "13/01/2024", "run": 390, "pos": 313, "time": "37:21", "ageGrade": 36.28, "pb": false, "weather": {"temp": 4.8, "rain": 0.0, "wind": 9.1, "gust": 15.5}}, {"date": "01/01/2024", "run": 389, "pos": 349, "time": "41:31", "ageGrade": 32.64, "pb": false, "weather": {"temp": 6.2, "rain": 0.0, "wind": 26.8, "gust": 55.1}}, {"date": "30/12/2023", "run": 388, "pos": 261, "time": "43:03", "ageGrade": 31.48, "pb": false, "weather": {"temp": 4.6, "rain": 0.4, "wind": 18.8, "gust": 36.0}}, {"date": "23/12/2023", "run": 386, "pos": 313, "time": "48:41", "ageGrade": 27.83, "pb": false, "weather": {"temp": 9.9, "rain": 0.1, "wind": 32.8, "gust": 58.0}}, {"date": "16/12/2023", "run": 385, "pos": 243, "time": "44:56", "ageGrade": 30.16, "pb": false, "weather": {"temp": 9.9, "rain": 0.0, "wind": 14.8, "gust": 26.3}}, {"date": "25/11/2023", "run": 383, "pos": 288, "time": "40:15", "ageGrade": 33.66, "pb": false, "weather": {"temp": 2.0, "rain": 0.0, "wind": 4.3, "gust": 9.7}}, {"date": "18/11/2023", "run": 382, "pos": 284, "time": "41:20", "ageGrade": 32.78, "pb": false, "weather": {"temp": 11.6, "rain": 0.0, "wind": 20.9, "gust": 38.5}}, {"date": "11/11/2023", "run": 381, "pos": 309, "time": "41:35", "ageGrade": 32.59, "pb": false, "weather": {"temp": 3.0, "rain": 0.0, "wind": 9.3, "gust": 15.1}}, {"date": "04/11/2023", "run": 380, "pos": 365, "time": "45:06", "ageGrade": 30.04, "pb": false, "weather": {"temp": 5.8, "rain": 0.0, "wind": 15.5, "gust": 28.1}}, {"date": "07/10/2023", "run": 377, "pos": 248, "time": "48:37", "ageGrade": 27.87, "pb": false, "weather": {"temp": 15.5, "rain": 0.0, "wind": 11.3, "gust": 20.9}}, {"date": "30/09/2023", "run": 376, "pos": 259, "time": "52:02", "ageGrade": 26.04, "pb": false, "weather": {"temp": 11.8, "rain": 0.0, "wind": 10.7, "gust": 19.1}}, {"date": "23/09/2023", "run": 375, "pos": 297, "time": "52:57", "ageGrade": 25.59, "pb": false, "weather": {"temp": 12.4, "rain": 0.2, "wind": 12.8, "gust": 27.7}}, {"date": "16/09/2023", "run": 374, "pos": 211, "time": "34:46", "ageGrade": 38.97, "pb": false, "weather": {"temp": 15.9, "rain": 0.0, "wind": 20.2, "gust": 36.7}}, {"date": "09/09/2023", "run": 373, "pos": 210, "time": "37:52", "ageGrade": 35.78, "pb": false, "weather": {"temp": 18.5, "rain": 0.0, "wind": 3.3, "gust": 13.7}}, {"date": "02/09/2023", "run": 372, "pos": 210, "time": "35:59", "ageGrade": 37.66, "pb": false, "weather": {"temp": 16.3, "rain": 0.0, "wind": 8.8, "gust": 19.1}}, {"date": "26/08/2023", "run": 371, "pos": 298, "time": "37:38", "ageGrade": 36.01, "pb": false, "weather": {"temp": 13.6, "rain": 0.1, "wind": 13.1, "gust": 26.3}}, {"date": "19/08/2023", "run": 370, "pos": 258, "time": "36:51", "ageGrade": 36.5, "pb": false, "weather": {"temp": 19.0, "rain": 0.0, "wind": 27.0, "gust": 50.8}}, {"date": "12/08/2023", "run": 369, "pos": 247, "time": "37:41", "ageGrade": 35.69, "pb": false, "weather": {"temp": 17.6, "rain": 0.1, "wind": 21.9, "gust": 50.0}}, {"date": "05/08/2023", "run": 368, "pos": 146, "time": "34:41", "ageGrade": 38.78, "pb": false, "weather": {"temp": 12.4, "rain": 2.5, "wind": 18.8, "gust": 33.8}}, {"date": "29/07/2023", "run": 367, "pos": 220, "time": "35:30", "ageGrade": 37.89, "pb": false, "weather": {"temp": 16.4, "rain": 0.1, "wind": 17.6, "gust": 37.1}}, {"date": "22/07/2023", "run": 366, "pos": 161, "time": "34:31", "ageGrade": 38.97, "pb": false, "weather": {"temp": 13.9, "rain": 1.2, "wind": 18.4, "gust": 32.4}}, {"date": "15/07/2023", "run": 365, "pos": 308, "time": "37:44", "ageGrade": 35.64, "pb": false, "weather": {"temp": 17.1, "rain": 0.0, "wind": 26.8, "gust": 51.5}}, {"date": "08/07/2023", "run": 364, "pos": 248, "time": "36:35", "ageGrade": 36.77, "pb": false, "weather": {"temp": 22.5, "rain": 0.0, "wind": 22.1, "gust": 41.0}}, {"date": "01/07/2023", "run": 363, "pos": 200, "time": "35:11", "ageGrade": 38.23, "pb": false, "weather": {"temp": 15.9, "rain": 0.1, "wind": 32.8, "gust": 59.8}}, {"date": "10/06/2023", "run": 360, "pos": 227, "time": "36:02", "ageGrade": 37.33, "pb": false, "weather": {"temp": 17.9, "rain": 0.0, "wind": 11.1, "gust": 24.1}}, {"date": "03/06/2023", "run": 359, "pos": 211, "time": "34:31", "ageGrade": 38.97, "pb": false, "weather": {"temp": 12.1, "rain": 0.0, "wind": 5.6, "gust": 17.3}}, {"date": "27/05/2023", "run": 358, "pos": 221, "time": "34:21", "ageGrade": 39.16, "pb": false, "weather": {"temp": 13.6, "rain": 0.0, "wind": 9.6, "gust": 22.0}}, {"date": "20/05/2023", "run": 357, "pos": 382, "time": "35:23", "ageGrade": 38.01, "pb": false, "weather": {"temp": 12.6, "rain": 0.0, "wind": 5.1, "gust": 15.5}}, {"date": "13/05/2023", "run": 356, "pos": 227, "time": "33:16", "ageGrade": 40.43, "pb": false, "weather": {"temp": 10.4, "rain": 0.0, "wind": 6.0, "gust": 17.3}}, {"date": "06/05/2023", "run": 355, "pos": 261, "time": "33:48", "ageGrade": 39.79, "pb": false, "weather": {"temp": 12.3, "rain": 0.1, "wind": 15.5, "gust": 29.9}}, {"date": "29/04/2023", "run": 354, "pos": 206, "time": "34:50", "ageGrade": 38.61, "pb": false, "weather": {"temp": 11.0, "rain": 0.0, "wind": 9.2, "gust": 21.6}}, {"date": "22/04/2023", "run": 353, "pos": 223, "time": "34:15", "ageGrade": 39.27, "pb": false, "weather": {"temp": 7.9, "rain": 0.0, "wind": 7.0, "gust": 16.9}}, {"date": "15/04/2023", "run": 352, "pos": 219, "time": "34:42", "ageGrade": 38.76, "pb": false, "weather": {"temp": 5.5, "rain": 0.0, "wind": 2.9, "gust": 13.7}}, {"date": "08/04/2023", "run": 351, "pos": 185, "time": "35:08", "ageGrade": 38.28, "pb": false, "weather": {"temp": 6.1, "rain": 0.0, "wind": 8.2, "gust": 18.4}}, {"date": "01/04/2023", "run": 350, "pos": 240, "time": "36:00", "ageGrade": 37.36, "pb": false, "weather": {"temp": 6.8, "rain": 0.0, "wind": 7.4, "gust": 16.6}}, {"date": "25/03/2023", "run": 349, "pos": 286, "time": "45:56", "ageGrade": 29.28, "pb": false, "weather": {"temp": 7.9, "rain": 2.7, "wind": 34.2, "gust": 60.5}}, {"date": "18/03/2023", "run": 348, "pos": 217, "time": "36:56", "ageGrade": 36.42, "pb": false, "weather": {"temp": 9.2, "rain": 0.0, "wind": 9.6, "gust": 19.1}}, {"date": "11/03/2023", "run": 347, "pos": 257, "time": "40:12", "ageGrade": 33.46, "pb": false, "weather": {"temp": -0.4, "rain": 0.0, "wind": 9.1, "gust": 18.0}}, {"date": "04/03/2023", "run": 346, "pos": 198, "time": "32:29", "ageGrade": 41.41, "pb": true, "weather": {"temp": 3.6, "rain": 0.0, "wind": 3.0, "gust": 8.6}}, {"date": "11/02/2023", "run": 343, "pos": 175, "time": "32:34", "ageGrade": 41.3, "pb": true, "weather": {"temp": 6.9, "rain": 0.0, "wind": 11.0, "gust": 18.4}}, {"date": "04/02/2023", "run": 342, "pos": 200, "time": "33:10", "ageGrade": 40.55, "pb": true, "weather": {"temp": 8.5, "rain": 0.0, "wind": 13.7, "gust": 23.4}}, {"date": "14/01/2023", "run": 340, "pos": 219, "time": "34:15", "ageGrade": 39.27, "pb": true, "weather": {"temp": 9.0, "rain": 0.0, "wind": 25.8, "gust": 45.4}}, {"date": "07/01/2023", "run": 339, "pos": 218, "time": "36:30", "ageGrade": 36.85, "pb": false, "weather": {"temp": 10.6, "rain": 0.4, "wind": 26.8, "gust": 54.0}}, {"date": "31/12/2022", "run": 337, "pos": 164, "time": "38:20", "ageGrade": 35.09, "pb": false, "weather": {"temp": 8.1, "rain": 1.1, "wind": 3.0, "gust": 8.3}}, {"date": "26/11/2022", "run": 333, "pos": 226, "time": "49:26", "ageGrade": 27.21, "pb": false, "weather": {"temp": 8.6, "rain": 0.5, "wind": 22.0, "gust": 37.8}}, {"date": "12/11/2022", "run": 331, "pos": 193, "time": "35:54", "ageGrade": 37.47, "pb": true, "weather": {"temp": 11.7, "rain": 0.0, "wind": 15.2, "gust": 28.1}}, {"date": "05/11/2022", "run": 330, "pos": 179, "time": "37:55", "ageGrade": 35.47, "pb": true, "weather": {"temp": 9.3, "rain": 0.0, "wind": 19.4, "gust": 34.2}}, {"date": "29/10/2022", "run": 329, "pos": 173, "time": "43:30", "ageGrade": 30.92, "pb": false, "weather": {"temp": 12.3, "rain": 0.8, "wind": 20.1, "gust": 37.1}}, {"date": "22/10/2022", "run": 328, "pos": 195, "time": "41:34", "ageGrade": 32.36, "pb": false, "weather": {"temp": 11.7, "rain": 0.0, "wind": 17.3, "gust": 31.3}}], "short": "Lee"}, {"id": "7939292", "name": "Sally BATES", "totalRuns": 133, "homeRuns": 133, "homeEvent": "Widnes", "ageCat": "VW35-39", "club100": false, "club250": false, "club500": false, "results": [{"date": "26/09/2026", "run": 527, "pos": 317, "time": "34:31", "ageGrade": 44.04, "pb": false, "weather": {"temp": 11.3, "rain": 0.0, "wind": 10.9, "gust": 23.0}}, {"date": "05/09/2026", "run": 524, "pos": 318, "time": "34:05", "ageGrade": 44.6, "pb": false, "weather": {"temp": 14.8, "rain": 0.1, "wind": 16.1, "gust": 37.4}}, {"date": "29/08/2026", "run": 523, "pos": 371, "time": "37:19", "ageGrade": 40.73, "pb": false, "weather": {"temp": 16.0, "rain": 0.2, "wind": 11.4, "gust": 25.6}}, {"date": "15/08/2026", "run": 521, "pos": 317, "time": "35:05", "ageGrade": 43.33, "pb": false, "weather": {"temp": 17.6, "rain": 0.0, "wind": 13.6, "gust": 32.8}}, {"date": "20/06/2026", "run": 513, "pos": 385, "time": "34:01", "ageGrade": 44.68, "pb": false, "weather": {"temp": 17.8, "rain": 0.0, "wind": 11.3, "gust": 30.6}}, {"date": "13/06/2026", "run": 512, "pos": 243, "time": "29:29", "ageGrade": 51.55, "pb": true, "weather": {"temp": 13.4, "rain": 0.1, "wind": 27.2, "gust": 60.8}}, {"date": "06/06/2026", "run": 511, "pos": 341, "time": "30:24", "ageGrade": 50.0, "pb": false, "weather": {"temp": 13.4, "rain": 0.1, "wind": 25.4, "gust": 61.6}}, {"date": "30/05/2026", "run": 510, "pos": 299, "time": "32:22", "ageGrade": 46.96, "pb": false, "weather": {"temp": 15.2, "rain": 0.0, "wind": 4.1, "gust": 16.6}}, {"date": "23/05/2026", "run": 509, "pos": 341, "time": "33:01", "ageGrade": 46.04, "pb": false, "weather": {"temp": 15.3, "rain": 0.1, "wind": 8.6, "gust": 23.8}}, {"date": "16/05/2026", "run": 508, "pos": 404, "time": "32:22", "ageGrade": 46.96, "pb": false, "weather": {"temp": 9.6, "rain": 0.1, "wind": 8.0, "gust": 20.9}}, {"date": "02/05/2026", "run": 507, "pos": 331, "time": "31:27", "ageGrade": 48.33, "pb": false, "weather": {"temp": 11.3, "rain": 0.0, "wind": 4.3, "gust": 16.2}}, {"date": "25/04/2026", "run": 506, "pos": 303, "time": "32:03", "ageGrade": 47.43, "pb": false, "weather": {"temp": 9.1, "rain": 0.0, "wind": 3.3, "gust": 13.3}}, {"date": "18/04/2026", "run": 505, "pos": 300, "time": "31:40", "ageGrade": 48.0, "pb": false, "weather": {"temp": 10.1, "rain": 0.0, "wind": 17.9, "gust": 40.0}}, {"date": "11/04/2026", "run": 504, "pos": 335, "time": "31:50", "ageGrade": 47.75, "pb": false, "weather": {"temp": 5.8, "rain": 0.0, "wind": 14.1, "gust": 29.9}}, {"date": "04/04/2026", "run": 503, "pos": 337, "time": "32:15", "ageGrade": 47.13, "pb": false, "weather": {"temp": 6.9, "rain": 0.0, "wind": 9.5, "gust": 21.6}}, {"date": "28/03/2026", "run": 502, "pos": 341, "time": "32:48", "ageGrade": 46.34, "pb": false, "weather": {"temp": 5.1, "rain": 0.4, "wind": 21.2, "gust": 54.7}}, {"date": "21/03/2026", "run": 501, "pos": 362, "time": "34:20", "ageGrade": 44.27, "pb": false, "weather": {"temp": 4.8, "rain": 0.0, "wind": 1.6, "gust": 9.4}}, {"date": "14/03/2026", "run": 500, "pos": 464, "time": "33:07", "ageGrade": 45.9, "pb": false, "weather": {"temp": 4.9, "rain": 0.0, "wind": 9.0, "gust": 17.6}}, {"date": "07/03/2026", "run": 499, "pos": 286, "time": "31:33", "ageGrade": 48.18, "pb": false, "weather": {"temp": 5.1, "rain": 0.0, "wind": 4.5, "gust": 12.2}}, {"date": "28/02/2026", "run": 498, "pos": 362, "time": "31:42", "ageGrade": 47.95, "pb": false, "weather": {"temp": 5.5, "rain": 0.2, "wind": 9.2, "gust": 19.8}}, {"date": "07/02/2026", "run": 495, "pos": 298, "time": "31:02", "ageGrade": 48.98, "pb": false, "weather": {"temp": 5.3, "rain": 0.0, "wind": 13.9, "gust": 28.4}}, {"date": "31/01/2026", "run": 494, "pos": 286, "time": "31:50", "ageGrade": 47.75, "pb": false, "weather": {"temp": 6.8, "rain": 0.0, "wind": 19.4, "gust": 44.3}}, {"date": "13/12/2025", "run": 486, "pos": 214, "time": "31:47", "ageGrade": 47.61, "pb": false, "weather": {"temp": 4.3, "rain": 0.0, "wind": 13.5, "gust": 27.4}}, {"date": "06/12/2025", "run": 485, "pos": 218, "time": "33:10", "ageGrade": 45.63, "pb": false, "weather": {"temp": 7.9, "rain": 0.0, "wind": 12.2, "gust": 26.3}}, {"date": "29/11/2025", "run": 484, "pos": 210, "time": "32:28", "ageGrade": 46.61, "pb": false, "weather": {"temp": 4.9, "rain": 0.0, "wind": 0.8, "gust": 4.3}}, {"date": "15/11/2025", "run": 483, "pos": 276, "time": "32:30", "ageGrade": 46.56, "pb": false, "weather": {"temp": 8.8, "rain": 0.0, "wind": 18.7, "gust": 45.0}}, {"date": "08/11/2025", "run": 482, "pos": 319, "time": "33:06", "ageGrade": 45.72, "pb": false, "weather": {"temp": 11.4, "rain": 0.0, "wind": 12.4, "gust": 24.8}}, {"date": "25/10/2025", "run": 480, "pos": 258, "time": "31:36", "ageGrade": 47.89, "pb": false, "weather": {"temp": 8.9, "rain": 0.0, "wind": 16.2, "gust": 35.3}}, {"date": "11/10/2025", "run": 478, "pos": 253, "time": "34:46", "ageGrade": 43.53, "pb": false, "weather": {"temp": 11.8, "rain": 0.0, "wind": 4.0, "gust": 10.1}}, {"date": "27/09/2025", "run": 476, "pos": 246, "time": "31:28", "ageGrade": 48.09, "pb": false, "weather": {"temp": 11.0, "rain": 0.0, "wind": 12.1, "gust": 30.2}}, {"date": "20/09/2025", "run": 475, "pos": 267, "time": "32:49", "ageGrade": 46.11, "pb": false, "weather": {"temp": 15.5, "rain": 1.2, "wind": 5.4, "gust": 14.4}}, {"date": "13/09/2025", "run": 474, "pos": 302, "time": "33:48", "ageGrade": 44.77, "pb": false, "weather": {"temp": 11.6, "rain": 0.0, "wind": 10.8, "gust": 27.0}}, {"date": "30/08/2025", "run": 472, "pos": 316, "time": "34:17", "ageGrade": 44.14, "pb": false, "weather": {"temp": 15.3, "rain": 0.0, "wind": 12.8, "gust": 32.0}}, {"date": "02/08/2025", "run": 468, "pos": 313, "time": "34:24", "ageGrade": 43.99, "pb": false, "weather": {"temp": 15.7, "rain": 0.0, "wind": 14.6, "gust": 34.6}}, {"date": "26/07/2025", "run": 467, "pos": 314, "time": "35:05", "ageGrade": 43.14, "pb": false, "weather": {"temp": 17.7, "rain": 0.1, "wind": 11.8, "gust": 30.6}}, {"date": "05/07/2025", "run": 464, "pos": 252, "time": "31:21", "ageGrade": 48.27, "pb": false, "weather": {"temp": 17.8, "rain": 0.1, "wind": 17.6, "gust": 40.0}}, {"date": "31/05/2025", "run": 459, "pos": 406, "time": "38:23", "ageGrade": 39.43, "pb": false, "weather": {"temp": 17.0, "rain": 0.0, "wind": 17.4, "gust": 40.7}}, {"date": "10/05/2025", "run": 456, "pos": 260, "time": "31:22", "ageGrade": 48.25, "pb": false, "weather": {"temp": 13.2, "rain": 0.0, "wind": 4.8, "gust": 18.7}}, {"date": "03/05/2025", "run": 455, "pos": 304, "time": "32:14", "ageGrade": 46.95, "pb": false, "weather": {"temp": 12.1, "rain": 0.0, "wind": 18.6, "gust": 42.8}}, {"date": "26/04/2025", "run": 454, "pos": 318, "time": "32:55", "ageGrade": 45.97, "pb": false, "weather": {"temp": 10.4, "rain": 0.1, "wind": 9.9, "gust": 24.5}}, {"date": "19/04/2025", "run": 453, "pos": 327, "time": "34:25", "ageGrade": 43.97, "pb": false, "weather": {"temp": 9.8, "rain": 0.0, "wind": 16.1, "gust": 39.2}}, {"date": "15/02/2025", "run": 444, "pos": 208, "time": "31:36", "ageGrade": 47.89, "pb": false, "weather": {"temp": 3.1, "rain": 0.0, "wind": 10.0, "gust": 23.0}}, {"date": "08/02/2025", "run": 443, "pos": 233, "time": "31:01", "ageGrade": 48.79, "pb": false, "weather": {"temp": 1.6, "rain": 0.0, "wind": 9.2, "gust": 18.7}}, {"date": "18/01/2025", "run": 441, "pos": 264, "time": "32:23", "ageGrade": 46.73, "pb": false, "weather": {"temp": 1.6, "rain": 0.0, "wind": 10.9, "gust": 23.0}}, {"date": "04/01/2025", "run": 440, "pos": 320, "time": "32:59", "ageGrade": 45.88, "pb": false, "weather": {"temp": 0.4, "rain": 0.0, "wind": 6.8, "gust": 14.4}}, {"date": "28/12/2024", "run": 439, "pos": 299, "time": "34:21", "ageGrade": 44.06, "pb": false, "weather": {"temp": 4.5, "rain": 0.0, "wind": 3.8, "gust": 10.1}}, {"date": "14/12/2024", "run": 436, "pos": 207, "time": "36:39", "ageGrade": 41.06, "pb": false, "weather": {"temp": 5.1, "rain": 0.0, "wind": 9.8, "gust": 22.7}}, {"date": "23/11/2024", "run": 434, "pos": 211, "time": "32:25", "ageGrade": 46.43, "pb": false, "weather": {"temp": 4.4, "rain": 1.6, "wind": 34.6, "gust": 68.8}}, {"date": "16/11/2024", "run": 433, "pos": 311, "time": "32:19", "ageGrade": 46.57, "pb": false, "weather": {"temp": 11.3, "rain": 0.8, "wind": 15.3, "gust": 37.1}}, {"date": "09/11/2024", "run": 432, "pos": 273, "time": "33:34", "ageGrade": 44.84, "pb": false, "weather": {"temp": 5.7, "rain": 0.0, "wind": 5.8, "gust": 11.5}}, {"date": "12/10/2024", "run": 428, "pos": 301, "time": "34:48", "ageGrade": 43.25, "pb": false, "weather": {"temp": 7.0, "rain": 0.0, "wind": 7.5, "gust": 14.8}}, {"date": "05/10/2024", "run": 427, "pos": 259, "time": "33:11", "ageGrade": 45.35, "pb": false, "weather": {"temp": 9.0, "rain": 0.0, "wind": 15.7, "gust": 30.6}}, {"date": "21/09/2024", "run": 425, "pos": 307, "time": "34:44", "ageGrade": 43.33, "pb": false, "weather": {"temp": 14.8, "rain": 0.0, "wind": 23.6, "gust": 43.9}}, {"date": "14/09/2024", "run": 424, "pos": 264, "time": "33:40", "ageGrade": 44.7, "pb": false, "weather": {"temp": 13.7, "rain": 0.0, "wind": 11.9, "gust": 26.3}}, {"date": "07/09/2024", "run": 423, "pos": 290, "time": "36:13", "ageGrade": 41.56, "pb": false, "weather": {"temp": 17.3, "rain": 0.0, "wind": 15.3, "gust": 33.1}}, {"date": "24/08/2024", "run": 421, "pos": 273, "time": "35:16", "ageGrade": 42.67, "pb": false, "weather": {"temp": 14.4, "rain": 0.2, "wind": 15.4, "gust": 31.0}}, {"date": "10/08/2024", "run": 419, "pos": 305, "time": "33:16", "ageGrade": 45.24, "pb": false, "weather": {"temp": 17.2, "rain": 0.1, "wind": 13.1, "gust": 24.1}}, {"date": "03/08/2024", "run": 418, "pos": 225, "time": "33:22", "ageGrade": 45.1, "pb": false, "weather": {"temp": 16.0, "rain": 0.0, "wind": 16.9, "gust": 32.0}}, {"date": "27/07/2024", "run": 417, "pos": 309, "time": "46:50", "ageGrade": 32.14, "pb": false, "weather": {"temp": 15.6, "rain": 0.0, "wind": 11.1, "gust": 24.1}}, {"date": "20/07/2024", "run": 416, "pos": 279, "time": "35:54", "ageGrade": 41.92, "pb": false, "weather": {"temp": 19.2, "rain": 0.0, "wind": 10.8, "gust": 22.3}}, {"date": "13/07/2024", "run": 415, "pos": 344, "time": "39:18", "ageGrade": 38.3, "pb": false, "weather": {"temp": 14.8, "rain": 0.2, "wind": 15.2, "gust": 28.8}}, {"date": "06/07/2024", "run": 414, "pos": 200, "time": "32:13", "ageGrade": 46.71, "pb": false, "weather": {"temp": 11.8, "rain": 0.5, "wind": 15.3, "gust": 31.0}}, {"date": "15/06/2024", "run": 411, "pos": 294, "time": "34:34", "ageGrade": 43.54, "pb": false, "weather": {"temp": 12.5, "rain": 0.0, "wind": 7.8, "gust": 21.2}}, {"date": "08/06/2024", "run": 410, "pos": 419, "time": "39:30", "ageGrade": 38.1, "pb": false, "weather": {"temp": 11.1, "rain": 0.0, "wind": 23.5, "gust": 45.0}}, {"date": "25/05/2024", "run": 408, "pos": 256, "time": "32:29", "ageGrade": 46.33, "pb": false, "weather": {"temp": 13.4, "rain": 0.0, "wind": 7.8, "gust": 19.8}}, {"date": "18/05/2024", "run": 407, "pos": 367, "time": "47:05", "ageGrade": 31.96, "pb": false, "weather": {"temp": 14.9, "rain": 0.0, "wind": 6.5, "gust": 16.9}}, {"date": "11/05/2024", "run": 406, "pos": 361, "time": "42:09", "ageGrade": 35.71, "pb": false, "weather": {"temp": 16.7, "rain": 0.0, "wind": 12.1, "gust": 26.3}}, {"date": "04/05/2024", "run": 405, "pos": 366, "time": "40:10", "ageGrade": 37.47, "pb": false, "weather": {"temp": 10.6, "rain": 0.1, "wind": 12.3, "gust": 22.7}}, {"date": "27/04/2024", "run": 404, "pos": 353, "time": "43:41", "ageGrade": 34.45, "pb": false, "weather": {"temp": 7.4, "rain": 0.0, "wind": 17.6, "gust": 34.9}}, {"date": "20/04/2024", "run": 403, "pos": 331, "time": "40:45", "ageGrade": 36.93, "pb": false, "weather": {"temp": 7.5, "rain": 0.0, "wind": 3.8, "gust": 13.7}}, {"date": "13/04/2024", "run": 402, "pos": 383, "time": "35:31", "ageGrade": 42.37, "pb": false, "weather": {"temp": 12.9, "rain": 0.0, "wind": 19.9, "gust": 38.2}}, {"date": "30/03/2024", "run": 400, "pos": 394, "time": "40:44", "ageGrade": 36.95, "pb": false, "weather": {"temp": 6.7, "rain": 0.0, "wind": 13.4, "gust": 27.4}}, {"date": "23/03/2024", "run": 399, "pos": 265, "time": "38:23", "ageGrade": 39.21, "pb": false, "weather": {"temp": 4.4, "rain": 2.0, "wind": 32.5, "gust": 64.1}}, {"date": "16/03/2024", "run": 398, "pos": 354, "time": "48:11", "ageGrade": 31.23, "pb": false, "weather": {"temp": 3.3, "rain": 0.0, "wind": 10.5, "gust": 23.4}}, {"date": "09/03/2024", "run": 397, "pos": 216, "time": "31:02", "ageGrade": 48.5, "pb": false, "weather": {"temp": 5.4, "rain": 0.1, "wind": 28.1, "gust": 48.6}}, {"date": "02/03/2024", "run": 396, "pos": 222, "time": "30:18", "ageGrade": 49.67, "pb": true, "weather": {"temp": 1.2, "rain": 0.0, "wind": 12.4, "gust": 23.0}}, {"date": "24/02/2024", "run": 395, "pos": 305, "time": "32:02", "ageGrade": 46.98, "pb": false, "weather": {"temp": -0.2, "rain": 0.0, "wind": 6.8, "gust": 15.1}}, {"date": "17/02/2024", "run": 394, "pos": 234, "time": "32:25", "ageGrade": 46.43, "pb": false, "weather": {"temp": 9.6, "rain": 0.0, "wind": 12.0, "gust": 21.2}}, {"date": "10/02/2024", "run": 393, "pos": 322, "time": "34:54", "ageGrade": 43.12, "pb": false, "weather": {"temp": 4.7, "rain": 0.0, "wind": 9.7, "gust": 18.0}}, {"date": "03/02/2024", "run": 392, "pos": 342, "time": "42:23", "ageGrade": 35.51, "pb": false, "weather": {"temp": 10.9, "rain": 0.0, "wind": 29.9, "gust": 53.6}}, {"date": "13/01/2024", "run": 390, "pos": 255, "time": "31:50", "ageGrade": 47.28, "pb": false, "weather": {"temp": 4.8, "rain": 0.0, "wind": 9.1, "gust": 15.5}}, {"date": "01/01/2024", "run": 389, "pos": 348, "time": "41:30", "ageGrade": 36.27, "pb": false, "weather": {"temp": 6.2, "rain": 0.0, "wind": 26.8, "gust": 55.1}}, {"date": "30/12/2023", "run": 388, "pos": 262, "time": "43:03", "ageGrade": 34.96, "pb": false, "weather": {"temp": 4.6, "rain": 0.4, "wind": 18.8, "gust": 36.0}}, {"date": "23/12/2023", "run": 386, "pos": 222, "time": "30:27", "ageGrade": 49.43, "pb": true, "weather": {"temp": 9.9, "rain": 0.1, "wind": 32.8, "gust": 58.0}}, {"date": "16/12/2023", "run": 385, "pos": 244, "time": "44:58", "ageGrade": 33.36, "pb": false, "weather": {"temp": 9.9, "rain": 0.0, "wind": 14.8, "gust": 26.3}}, {"date": "09/12/2023", "run": 384, "pos": 157, "time": "30:35", "ageGrade": 49.05, "pb": true, "weather": {"temp": 8.4, "rain": 5.7, "wind": 29.2, "gust": 52.6}}, {"date": "25/11/2023", "run": 383, "pos": 289, "time": "40:26", "ageGrade": 37.1, "pb": false, "weather": {"temp": 2.0, "rain": 0.0, "wind": 4.3, "gust": 9.7}}, {"date": "18/11/2023", "run": 382, "pos": 285, "time": "41:24", "ageGrade": 36.23, "pb": false, "weather": {"temp": 11.6, "rain": 0.0, "wind": 20.9, "gust": 38.5}}, {"date": "11/11/2023", "run": 381, "pos": 310, "time": "41:37", "ageGrade": 36.04, "pb": false, "weather": {"temp": 3.0, "rain": 0.0, "wind": 9.3, "gust": 15.1}}, {"date": "04/11/2023", "run": 380, "pos": 351, "time": "40:32", "ageGrade": 37.01, "pb": false, "weather": {"temp": 5.8, "rain": 0.0, "wind": 15.5, "gust": 28.1}}, {"date": "21/10/2023", "run": 378, "pos": 272, "time": "32:48", "ageGrade": 45.73, "pb": false, "weather": {"temp": 8.5, "rain": 0.0, "wind": 12.5, "gust": 22.0}}, {"date": "07/10/2023", "run": 377, "pos": 247, "time": "48:37", "ageGrade": 30.85, "pb": false, "weather": {"temp": 15.5, "rain": 0.0, "wind": 11.3, "gust": 20.9}}, {"date": "30/09/2023", "run": 376, "pos": 188, "time": "32:05", "ageGrade": 46.75, "pb": false, "weather": {"temp": 11.8, "rain": 0.0, "wind": 10.7, "gust": 19.1}}, {"date": "23/09/2023", "run": 375, "pos": 296, "time": "52:56", "ageGrade": 28.34, "pb": false, "weather": {"temp": 12.4, "rain": 0.2, "wind": 12.8, "gust": 27.7}}, {"date": "16/09/2023", "run": 374, "pos": 194, "time": "32:42", "ageGrade": 45.87, "pb": false, "weather": {"temp": 15.9, "rain": 0.0, "wind": 20.2, "gust": 36.7}}, {"date": "09/09/2023", "run": 373, "pos": 177, "time": "34:28", "ageGrade": 43.52, "pb": false, "weather": {"temp": 18.5, "rain": 0.0, "wind": 3.3, "gust": 13.7}}, {"date": "02/09/2023", "run": 372, "pos": 184, "time": "32:45", "ageGrade": 45.8, "pb": false, "weather": {"temp": 16.3, "rain": 0.0, "wind": 8.8, "gust": 19.1}}, {"date": "26/08/2023", "run": 371, "pos": 252, "time": "32:54", "ageGrade": 45.59, "pb": false, "weather": {"temp": 13.6, "rain": 0.1, "wind": 13.1, "gust": 26.3}}, {"date": "19/08/2023", "run": 370, "pos": 217, "time": "33:05", "ageGrade": 45.34, "pb": false, "weather": {"temp": 19.0, "rain": 0.0, "wind": 27.0, "gust": 50.8}}, {"date": "12/08/2023", "run": 369, "pos": 220, "time": "34:20", "ageGrade": 43.69, "pb": false, "weather": {"temp": 17.6, "rain": 0.1, "wind": 21.9, "gust": 50.0}}, {"date": "05/08/2023", "run": 368, "pos": 134, "time": "32:38", "ageGrade": 45.97, "pb": false, "weather": {"temp": 12.4, "rain": 2.5, "wind": 18.8, "gust": 33.8}}, {"date": "29/07/2023", "run": 367, "pos": 189, "time": "32:56", "ageGrade": 45.55, "pb": false, "weather": {"temp": 16.4, "rain": 0.1, "wind": 17.6, "gust": 37.1}}, {"date": "22/07/2023", "run": 366, "pos": 144, "time": "32:37", "ageGrade": 45.99, "pb": false, "weather": {"temp": 13.9, "rain": 1.2, "wind": 18.4, "gust": 32.4}}, {"date": "15/07/2023", "run": 365, "pos": 284, "time": "33:54", "ageGrade": 44.25, "pb": false, "weather": {"temp": 17.1, "rain": 0.0, "wind": 26.8, "gust": 51.5}}, {"date": "08/07/2023", "run": 364, "pos": 225, "time": "34:22", "ageGrade": 43.65, "pb": false, "weather": {"temp": 22.5, "rain": 0.0, "wind": 22.1, "gust": 41.0}}, {"date": "01/07/2023", "run": 363, "pos": 174, "time": "32:44", "ageGrade": 45.82, "pb": false, "weather": {"temp": 15.9, "rain": 0.1, "wind": 32.8, "gust": 59.8}}, {"date": "10/06/2023", "run": 360, "pos": 228, "time": "36:05", "ageGrade": 41.57, "pb": false, "weather": {"temp": 17.9, "rain": 0.0, "wind": 11.1, "gust": 24.1}}, {"date": "03/06/2023", "run": 359, "pos": 184, "time": "31:51", "ageGrade": 47.1, "pb": true, "weather": {"temp": 12.1, "rain": 0.0, "wind": 5.6, "gust": 17.3}}, {"date": "27/05/2023", "run": 358, "pos": 209, "time": "33:16", "ageGrade": 45.09, "pb": false, "weather": {"temp": 13.6, "rain": 0.0, "wind": 9.6, "gust": 22.0}}, {"date": "20/05/2023", "run": 357, "pos": 344, "time": "33:07", "ageGrade": 45.29, "pb": false, "weather": {"temp": 12.6, "rain": 0.0, "wind": 5.1, "gust": 15.5}}, {"date": "13/05/2023", "run": 356, "pos": 218, "time": "32:38", "ageGrade": 45.97, "pb": false, "weather": {"temp": 10.4, "rain": 0.0, "wind": 6.0, "gust": 17.3}}, {"date": "06/05/2023", "run": 355, "pos": 238, "time": "32:08", "ageGrade": 46.68, "pb": true, "weather": {"temp": 12.3, "rain": 0.1, "wind": 15.5, "gust": 29.9}}, {"date": "29/04/2023", "run": 354, "pos": 173, "time": "32:10", "ageGrade": 46.63, "pb": true, "weather": {"temp": 11.0, "rain": 0.0, "wind": 9.2, "gust": 21.6}}, {"date": "22/04/2023", "run": 353, "pos": 214, "time": "33:25", "ageGrade": 44.89, "pb": false, "weather": {"temp": 7.9, "rain": 0.0, "wind": 7.0, "gust": 16.9}}, {"date": "15/04/2023", "run": 352, "pos": 187, "time": "32:21", "ageGrade": 46.37, "pb": true, "weather": {"temp": 5.5, "rain": 0.0, "wind": 2.9, "gust": 13.7}}, {"date": "08/04/2023", "run": 351, "pos": 167, "time": "32:46", "ageGrade": 45.78, "pb": true, "weather": {"temp": 6.1, "rain": 0.0, "wind": 8.2, "gust": 18.4}}, {"date": "01/04/2023", "run": 350, "pos": 218, "time": "32:58", "ageGrade": 45.5, "pb": true, "weather": {"temp": 6.8, "rain": 0.0, "wind": 7.4, "gust": 16.6}}, {"date": "25/03/2023", "run": 349, "pos": 222, "time": "33:36", "ageGrade": 44.64, "pb": false, "weather": {"temp": 7.9, "rain": 2.7, "wind": 34.2, "gust": 60.5}}, {"date": "18/03/2023", "run": 348, "pos": 184, "time": "33:36", "ageGrade": 44.64, "pb": false, "weather": {"temp": 9.2, "rain": 0.0, "wind": 9.6, "gust": 19.1}}, {"date": "11/03/2023", "run": 347, "pos": 221, "time": "33:17", "ageGrade": 45.07, "pb": true, "weather": {"temp": -0.4, "rain": 0.0, "wind": 9.1, "gust": 18.0}}, {"date": "04/03/2023", "run": 346, "pos": 217, "time": "33:58", "ageGrade": 44.16, "pb": true, "weather": {"temp": 3.6, "rain": 0.0, "wind": 3.0, "gust": 8.6}}, {"date": "11/02/2023", "run": 343, "pos": 202, "time": "35:15", "ageGrade": 42.55, "pb": false, "weather": {"temp": 6.9, "rain": 0.0, "wind": 11.0, "gust": 18.4}}, {"date": "04/02/2023", "run": 342, "pos": 214, "time": "34:29", "ageGrade": 43.5, "pb": true, "weather": {"temp": 8.5, "rain": 0.0, "wind": 13.7, "gust": 23.4}}, {"date": "14/01/2023", "run": 340, "pos": 223, "time": "34:40", "ageGrade": 43.27, "pb": true, "weather": {"temp": 9.0, "rain": 0.0, "wind": 25.8, "gust": 45.4}}, {"date": "07/01/2023", "run": 339, "pos": 219, "time": "36:41", "ageGrade": 40.89, "pb": false, "weather": {"temp": 10.6, "rain": 0.4, "wind": 26.8, "gust": 54.0}}, {"date": "31/12/2022", "run": 337, "pos": 162, "time": "37:32", "ageGrade": 39.96, "pb": false, "weather": {"temp": 8.1, "rain": 1.1, "wind": 3.0, "gust": 8.3}}, {"date": "26/11/2022", "run": 333, "pos": 194, "time": "36:19", "ageGrade": 41.17, "pb": true, "weather": {"temp": 8.6, "rain": 0.5, "wind": 22.0, "gust": 37.8}}, {"date": "19/11/2022", "run": 332, "pos": 232, "time": "38:02", "ageGrade": 39.31, "pb": false, "weather": {"temp": 4.0, "rain": 0.0, "wind": 8.0, "gust": 13.7}}, {"date": "12/11/2022", "run": 331, "pos": 199, "time": "37:12", "ageGrade": 40.19, "pb": true, "weather": {"temp": 11.7, "rain": 0.0, "wind": 15.2, "gust": 28.1}}, {"date": "05/11/2022", "run": 330, "pos": 186, "time": "39:21", "ageGrade": 37.99, "pb": true, "weather": {"temp": 9.3, "rain": 0.0, "wind": 19.4, "gust": 34.2}}, {"date": "29/10/2022", "run": 329, "pos": 172, "time": "43:30", "ageGrade": 34.37, "pb": false, "weather": {"temp": 12.3, "rain": 0.8, "wind": 20.1, "gust": 37.1}}, {"date": "22/10/2022", "run": 328, "pos": 197, "time": "41:38", "ageGrade": 35.91, "pb": true, "weather": {"temp": 11.7, "rain": 0.0, "wind": 17.3, "gust": 31.3}}, {"date": "15/10/2022", "run": 327, "pos": 204, "time": "48:31", "ageGrade": 30.81, "pb": false, "weather": {"temp": 10.8, "rain": 0.0, "wind": 19.5, "gust": 38.5}}], "short": "Sally"}]};
+const PAYLOAD = {"generatedAt": "2026-10-10T10:04:37.706527+00:00", "event": "widnes", "runners": [{"id": "7959573", "name": "Lee BATES", "totalRuns": 128, "homeRuns": 128, "homeEvent": "Widnes", "ageCat": "VM40-44", "club100": false, "club250": false, "club500": false, "results": [{"date": "10/10/2026", "run": 529, "pos": 275, "time": "32:14", "ageGrade": 42.97, "pb": false, "weather": {"temp": 10.9, "rain": 0.2, "wind": 25.6, "gust": 55.1}}, {"date": "26/09/2026", "run": 527, "pos": 316, "time": "34:30", "ageGrade": 40.14, "pb": false, "weather": {"temp": 11.3, "rain": 0.0, "wind": 10.9, "gust": 23.0}}, {"date": "05/09/2026", "run": 524, "pos": 319, "time": "34:06", "ageGrade": 40.62, "pb": false, "weather": {"temp": 14.8, "rain": 0.1, "wind": 16.1, "gust": 37.4}}, {"date": "29/08/2026", "run": 523, "pos": 370, "time": "37:08", "ageGrade": 37.3, "pb": false, "weather": {"temp": 16.0, "rain": 0.2, "wind": 11.4, "gust": 25.6}}, {"date": "15/08/2026", "run": 521, "pos": 316, "time": "35:04", "ageGrade": 39.21, "pb": false, "weather": {"temp": 17.6, "rain": 0.0, "wind": 13.6, "gust": 32.8}}, {"date": "20/06/2026", "run": 513, "pos": 384, "time": "34:00", "ageGrade": 40.44, "pb": false, "weather": {"temp": 17.8, "rain": 0.0, "wind": 11.3, "gust": 30.6}}, {"date": "13/06/2026", "run": 512, "pos": 259, "time": "30:23", "ageGrade": 45.26, "pb": false, "weather": {"temp": 13.4, "rain": 0.1, "wind": 27.2, "gust": 60.8}}, {"date": "06/06/2026", "run": 511, "pos": 340, "time": "30:23", "ageGrade": 45.26, "pb": false, "weather": {"temp": 13.4, "rain": 0.1, "wind": 25.4, "gust": 61.6}}, {"date": "30/05/2026", "run": 510, "pos": 298, "time": "32:17", "ageGrade": 42.59, "pb": false, "weather": {"temp": 15.2, "rain": 0.0, "wind": 4.1, "gust": 16.6}}, {"date": "23/05/2026", "run": 509, "pos": 340, "time": "33:00", "ageGrade": 41.67, "pb": false, "weather": {"temp": 15.3, "rain": 0.1, "wind": 8.6, "gust": 23.8}}, {"date": "16/05/2026", "run": 508, "pos": 403, "time": "32:21", "ageGrade": 42.5, "pb": false, "weather": {"temp": 9.6, "rain": 0.1, "wind": 8.0, "gust": 20.9}}, {"date": "02/05/2026", "run": 507, "pos": 329, "time": "31:23", "ageGrade": 43.81, "pb": false, "weather": {"temp": 11.3, "rain": 0.0, "wind": 4.3, "gust": 16.2}}, {"date": "25/04/2026", "run": 506, "pos": 302, "time": "32:02", "ageGrade": 42.92, "pb": false, "weather": {"temp": 9.1, "rain": 0.0, "wind": 3.3, "gust": 13.3}}, {"date": "18/04/2026", "run": 505, "pos": 301, "time": "31:41", "ageGrade": 43.4, "pb": false, "weather": {"temp": 10.1, "rain": 0.0, "wind": 17.9, "gust": 40.0}}, {"date": "11/04/2026", "run": 504, "pos": 334, "time": "31:46", "ageGrade": 43.28, "pb": false, "weather": {"temp": 5.8, "rain": 0.0, "wind": 14.1, "gust": 29.9}}, {"date": "04/04/2026", "run": 503, "pos": 338, "time": "32:16", "ageGrade": 42.61, "pb": false, "weather": {"temp": 6.9, "rain": 0.0, "wind": 9.5, "gust": 21.6}}, {"date": "28/03/2026", "run": 502, "pos": 342, "time": "32:49", "ageGrade": 41.9, "pb": false, "weather": {"temp": 5.1, "rain": 0.4, "wind": 21.2, "gust": 54.7}}, {"date": "21/03/2026", "run": 501, "pos": 360, "time": "34:18", "ageGrade": 40.09, "pb": false, "weather": {"temp": 4.8, "rain": 0.0, "wind": 1.6, "gust": 9.4}}, {"date": "14/03/2026", "run": 500, "pos": 463, "time": "33:07", "ageGrade": 41.52, "pb": false, "weather": {"temp": 4.9, "rain": 0.0, "wind": 9.0, "gust": 17.6}}, {"date": "07/03/2026", "run": 499, "pos": 245, "time": "30:08", "ageGrade": 45.63, "pb": false, "weather": {"temp": 5.1, "rain": 0.0, "wind": 4.5, "gust": 12.2}}, {"date": "28/02/2026", "run": 498, "pos": 313, "time": "30:21", "ageGrade": 45.3, "pb": false, "weather": {"temp": 5.5, "rain": 0.2, "wind": 9.2, "gust": 19.8}}, {"date": "07/02/2026", "run": 495, "pos": 241, "time": "28:57", "ageGrade": 47.5, "pb": false, "weather": {"temp": 5.3, "rain": 0.0, "wind": 13.9, "gust": 28.4}}, {"date": "31/01/2026", "run": 494, "pos": 227, "time": "29:40", "ageGrade": 46.35, "pb": false, "weather": {"temp": 6.8, "rain": 0.0, "wind": 19.4, "gust": 44.3}}, {"date": "13/12/2025", "run": 486, "pos": 175, "time": "28:56", "ageGrade": 47.52, "pb": true, "weather": {"temp": 4.3, "rain": 0.0, "wind": 13.5, "gust": 27.4}}, {"date": "06/12/2025", "run": 485, "pos": 219, "time": "33:10", "ageGrade": 41.46, "pb": false, "weather": {"temp": 7.9, "rain": 0.0, "wind": 12.2, "gust": 26.3}}, {"date": "29/11/2025", "run": 484, "pos": 176, "time": "29:37", "ageGrade": 46.43, "pb": true, "weather": {"temp": 4.9, "rain": 0.0, "wind": 0.8, "gust": 4.3}}, {"date": "25/10/2025", "run": 480, "pos": 237, "time": "30:35", "ageGrade": 44.96, "pb": false, "weather": {"temp": 8.9, "rain": 0.0, "wind": 16.2, "gust": 35.3}}, {"date": "11/10/2025", "run": 478, "pos": 252, "time": "34:45", "ageGrade": 39.57, "pb": false, "weather": {"temp": 11.8, "rain": 0.0, "wind": 4.0, "gust": 10.1}}, {"date": "27/09/2025", "run": 476, "pos": 226, "time": "30:19", "ageGrade": 45.35, "pb": false, "weather": {"temp": 11.0, "rain": 0.0, "wind": 12.1, "gust": 30.2}}, {"date": "20/09/2025", "run": 475, "pos": 266, "time": "32:43", "ageGrade": 42.03, "pb": false, "weather": {"temp": 15.5, "rain": 1.2, "wind": 5.4, "gust": 14.4}}, {"date": "13/09/2025", "run": 474, "pos": 301, "time": "33:47", "ageGrade": 40.7, "pb": false, "weather": {"temp": 11.6, "rain": 0.0, "wind": 10.8, "gust": 27.0}}, {"date": "30/08/2025", "run": 472, "pos": 315, "time": "34:16", "ageGrade": 40.13, "pb": false, "weather": {"temp": 15.3, "rain": 0.0, "wind": 12.8, "gust": 32.0}}, {"date": "02/08/2025", "run": 468, "pos": 314, "time": "34:26", "ageGrade": 39.64, "pb": false, "weather": {"temp": 15.7, "rain": 0.0, "wind": 14.6, "gust": 34.6}}, {"date": "26/07/2025", "run": 467, "pos": 315, "time": "35:05", "ageGrade": 38.91, "pb": false, "weather": {"temp": 17.7, "rain": 0.1, "wind": 11.8, "gust": 30.6}}, {"date": "05/07/2025", "run": 464, "pos": 247, "time": "31:07", "ageGrade": 43.87, "pb": false, "weather": {"temp": 17.8, "rain": 0.1, "wind": 17.6, "gust": 40.0}}, {"date": "31/05/2025", "run": 459, "pos": 405, "time": "38:22", "ageGrade": 35.58, "pb": false, "weather": {"temp": 17.0, "rain": 0.0, "wind": 17.4, "gust": 40.7}}, {"date": "10/05/2025", "run": 456, "pos": 228, "time": "29:39", "ageGrade": 46.04, "pb": true, "weather": {"temp": 13.2, "rain": 0.0, "wind": 4.8, "gust": 18.7}}, {"date": "03/05/2025", "run": 455, "pos": 251, "time": "30:11", "ageGrade": 45.22, "pb": false, "weather": {"temp": 12.1, "rain": 0.0, "wind": 18.6, "gust": 42.8}}, {"date": "26/04/2025", "run": 454, "pos": 264, "time": "30:26", "ageGrade": 44.85, "pb": false, "weather": {"temp": 10.4, "rain": 0.1, "wind": 9.9, "gust": 24.5}}, {"date": "19/04/2025", "run": 453, "pos": 326, "time": "34:24", "ageGrade": 39.68, "pb": false, "weather": {"temp": 9.8, "rain": 0.0, "wind": 16.1, "gust": 39.2}}, {"date": "15/02/2025", "run": 444, "pos": 209, "time": "31:37", "ageGrade": 43.17, "pb": false, "weather": {"temp": 3.1, "rain": 0.0, "wind": 10.0, "gust": 23.0}}, {"date": "08/02/2025", "run": 443, "pos": 207, "time": "29:55", "ageGrade": 45.63, "pb": true, "weather": {"temp": 1.6, "rain": 0.0, "wind": 9.2, "gust": 18.7}}, {"date": "18/01/2025", "run": 441, "pos": 239, "time": "31:17", "ageGrade": 43.63, "pb": false, "weather": {"temp": 1.6, "rain": 0.0, "wind": 10.9, "gust": 23.0}}, {"date": "04/01/2025", "run": 440, "pos": 314, "time": "32:45", "ageGrade": 41.68, "pb": false, "weather": {"temp": 0.4, "rain": 0.0, "wind": 6.8, "gust": 14.4}}, {"date": "28/12/2024", "run": 439, "pos": 298, "time": "34:15", "ageGrade": 39.85, "pb": false, "weather": {"temp": 4.5, "rain": 0.0, "wind": 3.8, "gust": 10.1}}, {"date": "14/12/2024", "run": 436, "pos": 206, "time": "36:36", "ageGrade": 37.3, "pb": false, "weather": {"temp": 5.1, "rain": 0.0, "wind": 9.8, "gust": 22.7}}, {"date": "23/11/2024", "run": 434, "pos": 204, "time": "31:36", "ageGrade": 43.2, "pb": false, "weather": {"temp": 4.4, "rain": 1.6, "wind": 34.6, "gust": 68.8}}, {"date": "16/11/2024", "run": 433, "pos": 294, "time": "30:56", "ageGrade": 44.13, "pb": true, "weather": {"temp": 11.3, "rain": 0.8, "wind": 15.3, "gust": 37.1}}, {"date": "09/11/2024", "run": 432, "pos": 261, "time": "32:46", "ageGrade": 41.66, "pb": false, "weather": {"temp": 5.7, "rain": 0.0, "wind": 5.8, "gust": 11.5}}, {"date": "12/10/2024", "run": 428, "pos": 299, "time": "34:39", "ageGrade": 39.39, "pb": false, "weather": {"temp": 7.0, "rain": 0.0, "wind": 7.5, "gust": 14.8}}, {"date": "05/10/2024", "run": 427, "pos": 278, "time": "34:38", "ageGrade": 39.41, "pb": false, "weather": {"temp": 9.0, "rain": 0.0, "wind": 15.7, "gust": 30.6}}, {"date": "21/09/2024", "run": 425, "pos": 306, "time": "34:40", "ageGrade": 39.38, "pb": false, "weather": {"temp": 14.8, "rain": 0.0, "wind": 23.6, "gust": 43.9}}, {"date": "14/09/2024", "run": 424, "pos": 259, "time": "33:32", "ageGrade": 40.71, "pb": false, "weather": {"temp": 13.7, "rain": 0.0, "wind": 11.9, "gust": 26.3}}, {"date": "07/09/2024", "run": 423, "pos": 285, "time": "36:06", "ageGrade": 37.81, "pb": false, "weather": {"temp": 17.3, "rain": 0.0, "wind": 15.3, "gust": 33.1}}, {"date": "24/08/2024", "run": 421, "pos": 267, "time": "34:13", "ageGrade": 39.89, "pb": false, "weather": {"temp": 14.4, "rain": 0.2, "wind": 15.4, "gust": 31.0}}, {"date": "10/08/2024", "run": 419, "pos": 300, "time": "32:58", "ageGrade": 41.1, "pb": false, "weather": {"temp": 17.2, "rain": 0.1, "wind": 13.1, "gust": 24.1}}, {"date": "03/08/2024", "run": 418, "pos": 235, "time": "34:23", "ageGrade": 39.41, "pb": false, "weather": {"temp": 16.0, "rain": 0.0, "wind": 16.9, "gust": 32.0}}, {"date": "27/07/2024", "run": 417, "pos": 250, "time": "33:54", "ageGrade": 39.97, "pb": false, "weather": {"temp": 15.6, "rain": 0.0, "wind": 11.1, "gust": 24.1}}, {"date": "20/07/2024", "run": 416, "pos": 278, "time": "35:54", "ageGrade": 37.74, "pb": false, "weather": {"temp": 19.2, "rain": 0.0, "wind": 10.8, "gust": 22.3}}, {"date": "13/07/2024", "run": 415, "pos": 306, "time": "34:05", "ageGrade": 39.76, "pb": false, "weather": {"temp": 14.8, "rain": 0.2, "wind": 15.2, "gust": 28.8}}, {"date": "06/07/2024", "run": 414, "pos": 232, "time": "36:52", "ageGrade": 36.75, "pb": false, "weather": {"temp": 11.8, "rain": 0.5, "wind": 15.3, "gust": 31.0}}, {"date": "15/06/2024", "run": 411, "pos": 290, "time": "34:23", "ageGrade": 39.41, "pb": false, "weather": {"temp": 12.5, "rain": 0.0, "wind": 7.8, "gust": 21.2}}, {"date": "08/06/2024", "run": 410, "pos": 427, "time": "41:05", "ageGrade": 32.98, "pb": false, "weather": {"temp": 11.1, "rain": 0.0, "wind": 23.5, "gust": 45.0}}, {"date": "25/05/2024", "run": 408, "pos": 330, "time": "38:00", "ageGrade": 35.66, "pb": false, "weather": {"temp": 13.4, "rain": 0.0, "wind": 7.8, "gust": 19.8}}, {"date": "18/05/2024", "run": 407, "pos": 305, "time": "35:26", "ageGrade": 38.24, "pb": false, "weather": {"temp": 14.9, "rain": 0.0, "wind": 6.5, "gust": 16.9}}, {"date": "11/05/2024", "run": 406, "pos": 303, "time": "35:10", "ageGrade": 38.53, "pb": false, "weather": {"temp": 16.7, "rain": 0.0, "wind": 12.1, "gust": 26.3}}, {"date": "04/05/2024", "run": 405, "pos": 300, "time": "34:18", "ageGrade": 39.5, "pb": false, "weather": {"temp": 10.6, "rain": 0.1, "wind": 12.3, "gust": 22.7}}, {"date": "27/04/2024", "run": 404, "pos": 301, "time": "35:09", "ageGrade": 38.55, "pb": false, "weather": {"temp": 7.4, "rain": 0.0, "wind": 17.6, "gust": 34.9}}, {"date": "20/04/2024", "run": 403, "pos": 304, "time": "36:10", "ageGrade": 37.47, "pb": false, "weather": {"temp": 7.5, "rain": 0.0, "wind": 3.8, "gust": 13.7}}, {"date": "13/04/2024", "run": 402, "pos": 403, "time": "36:51", "ageGrade": 36.77, "pb": false, "weather": {"temp": 12.9, "rain": 0.0, "wind": 19.9, "gust": 38.2}}, {"date": "30/03/2024", "run": 400, "pos": 395, "time": "40:45", "ageGrade": 33.25, "pb": false, "weather": {"temp": 6.7, "rain": 0.0, "wind": 13.4, "gust": 27.4}}, {"date": "23/03/2024", "run": 399, "pos": 263, "time": "38:18", "ageGrade": 35.38, "pb": false, "weather": {"temp": 4.4, "rain": 2.0, "wind": 32.5, "gust": 64.1}}, {"date": "16/03/2024", "run": 398, "pos": 355, "time": "48:11", "ageGrade": 28.12, "pb": false, "weather": {"temp": 3.3, "rain": 0.0, "wind": 10.5, "gust": 23.4}}, {"date": "09/03/2024", "run": 397, "pos": 272, "time": "34:51", "ageGrade": 38.88, "pb": false, "weather": {"temp": 5.4, "rain": 0.1, "wind": 28.1, "gust": 48.6}}, {"date": "02/03/2024", "run": 396, "pos": 299, "time": "35:15", "ageGrade": 38.44, "pb": false, "weather": {"temp": 1.2, "rain": 0.0, "wind": 12.4, "gust": 23.0}}, {"date": "24/02/2024", "run": 395, "pos": 396, "time": "36:42", "ageGrade": 36.92, "pb": false, "weather": {"temp": -0.2, "rain": 0.0, "wind": 6.8, "gust": 15.1}}, {"date": "17/02/2024", "run": 394, "pos": 309, "time": "36:54", "ageGrade": 36.72, "pb": false, "weather": {"temp": 9.6, "rain": 0.0, "wind": 12.0, "gust": 21.2}}, {"date": "10/02/2024", "run": 393, "pos": 365, "time": "39:50", "ageGrade": 34.02, "pb": false, "weather": {"temp": 4.7, "rain": 0.0, "wind": 9.7, "gust": 18.0}}, {"date": "03/02/2024", "run": 392, "pos": 341, "time": "42:11", "ageGrade": 32.12, "pb": false, "weather": {"temp": 10.9, "rain": 0.0, "wind": 29.9, "gust": 53.6}}, {"date": "13/01/2024", "run": 390, "pos": 313, "time": "37:21", "ageGrade": 36.28, "pb": false, "weather": {"temp": 4.8, "rain": 0.0, "wind": 9.1, "gust": 15.5}}, {"date": "01/01/2024", "run": 389, "pos": 349, "time": "41:31", "ageGrade": 32.64, "pb": false, "weather": {"temp": 6.2, "rain": 0.0, "wind": 26.8, "gust": 55.1}}, {"date": "30/12/2023", "run": 388, "pos": 261, "time": "43:03", "ageGrade": 31.48, "pb": false, "weather": {"temp": 4.6, "rain": 0.4, "wind": 18.8, "gust": 36.0}}, {"date": "23/12/2023", "run": 386, "pos": 313, "time": "48:41", "ageGrade": 27.83, "pb": false, "weather": {"temp": 9.9, "rain": 0.1, "wind": 32.8, "gust": 58.0}}, {"date": "16/12/2023", "run": 385, "pos": 243, "time": "44:56", "ageGrade": 30.16, "pb": false, "weather": {"temp": 9.9, "rain": 0.0, "wind": 14.8, "gust": 26.3}}, {"date": "25/11/2023", "run": 383, "pos": 288, "time": "40:15", "ageGrade": 33.66, "pb": false, "weather": {"temp": 2.0, "rain": 0.0, "wind": 4.3, "gust": 9.7}}, {"date": "18/11/2023", "run": 382, "pos": 284, "time": "41:20", "ageGrade": 32.78, "pb": false, "weather": {"temp": 11.6, "rain": 0.0, "wind": 20.9, "gust": 38.5}}, {"date": "11/11/2023", "run": 381, "pos": 309, "time": "41:35", "ageGrade": 32.59, "pb": false, "weather": {"temp": 3.0, "rain": 0.0, "wind": 9.3, "gust": 15.1}}, {"date": "04/11/2023", "run": 380, "pos": 365, "time": "45:06", "ageGrade": 30.04, "pb": false, "weather": {"temp": 5.8, "rain": 0.0, "wind": 15.5, "gust": 28.1}}, {"date": "07/10/2023", "run": 377, "pos": 248, "time": "48:37", "ageGrade": 27.87, "pb": false, "weather": {"temp": 15.5, "rain": 0.0, "wind": 11.3, "gust": 20.9}}, {"date": "30/09/2023", "run": 376, "pos": 259, "time": "52:02", "ageGrade": 26.04, "pb": false, "weather": {"temp": 11.8, "rain": 0.0, "wind": 10.7, "gust": 19.1}}, {"date": "23/09/2023", "run": 375, "pos": 297, "time": "52:57", "ageGrade": 25.59, "pb": false, "weather": {"temp": 12.4, "rain": 0.2, "wind": 12.8, "gust": 27.7}}, {"date": "16/09/2023", "run": 374, "pos": 211, "time": "34:46", "ageGrade": 38.97, "pb": false, "weather": {"temp": 15.9, "rain": 0.0, "wind": 20.2, "gust": 36.7}}, {"date": "09/09/2023", "run": 373, "pos": 210, "time": "37:52", "ageGrade": 35.78, "pb": false, "weather": {"temp": 18.5, "rain": 0.0, "wind": 3.3, "gust": 13.7}}, {"date": "02/09/2023", "run": 372, "pos": 210, "time": "35:59", "ageGrade": 37.66, "pb": false, "weather": {"temp": 16.3, "rain": 0.0, "wind": 8.8, "gust": 19.1}}, {"date": "26/08/2023", "run": 371, "pos": 298, "time": "37:38", "ageGrade": 36.01, "pb": false, "weather": {"temp": 13.6, "rain": 0.1, "wind": 13.1, "gust": 26.3}}, {"date": "19/08/2023", "run": 370, "pos": 258, "time": "36:51", "ageGrade": 36.5, "pb": false, "weather": {"temp": 19.0, "rain": 0.0, "wind": 27.0, "gust": 50.8}}, {"date": "12/08/2023", "run": 369, "pos": 247, "time": "37:41", "ageGrade": 35.69, "pb": false, "weather": {"temp": 17.6, "rain": 0.1, "wind": 21.9, "gust": 50.0}}, {"date": "05/08/2023", "run": 368, "pos": 146, "time": "34:41", "ageGrade": 38.78, "pb": false, "weather": {"temp": 12.4, "rain": 2.5, "wind": 18.8, "gust": 33.8}}, {"date": "29/07/2023", "run": 367, "pos": 220, "time": "35:30", "ageGrade": 37.89, "pb": false, "weather": {"temp": 16.4, "rain": 0.1, "wind": 17.6, "gust": 37.1}}, {"date": "22/07/2023", "run": 366, "pos": 161, "time": "34:31", "ageGrade": 38.97, "pb": false, "weather": {"temp": 13.9, "rain": 1.2, "wind": 18.4, "gust": 32.4}}, {"date": "15/07/2023", "run": 365, "pos": 308, "time": "37:44", "ageGrade": 35.64, "pb": false, "weather": {"temp": 17.1, "rain": 0.0, "wind": 26.8, "gust": 51.5}}, {"date": "08/07/2023", "run": 364, "pos": 248, "time": "36:35", "ageGrade": 36.77, "pb": false, "weather": {"temp": 22.5, "rain": 0.0, "wind": 22.1, "gust": 41.0}}, {"date": "01/07/2023", "run": 363, "pos": 200, "time": "35:11", "ageGrade": 38.23, "pb": false, "weather": {"temp": 15.9, "rain": 0.1, "wind": 32.8, "gust": 59.8}}, {"date": "10/06/2023", "run": 360, "pos": 227, "time": "36:02", "ageGrade": 37.33, "pb": false, "weather": {"temp": 17.9, "rain": 0.0, "wind": 11.1, "gust": 24.1}}, {"date": "03/06/2023", "run": 359, "pos": 211, "time": "34:31", "ageGrade": 38.97, "pb": false, "weather": {"temp": 12.1, "rain": 0.0, "wind": 5.6, "gust": 17.3}}, {"date": "27/05/2023", "run": 358, "pos": 221, "time": "34:21", "ageGrade": 39.16, "pb": false, "weather": {"temp": 13.6, "rain": 0.0, "wind": 9.6, "gust": 22.0}}, {"date": "20/05/2023", "run": 357, "pos": 382, "time": "35:23", "ageGrade": 38.01, "pb": false, "weather": {"temp": 12.6, "rain": 0.0, "wind": 5.1, "gust": 15.5}}, {"date": "13/05/2023", "run": 356, "pos": 227, "time": "33:16", "ageGrade": 40.43, "pb": false, "weather": {"temp": 10.4, "rain": 0.0, "wind": 6.0, "gust": 17.3}}, {"date": "06/05/2023", "run": 355, "pos": 261, "time": "33:48", "ageGrade": 39.79, "pb": false, "weather": {"temp": 12.3, "rain": 0.1, "wind": 15.5, "gust": 29.9}}, {"date": "29/04/2023", "run": 354, "pos": 206, "time": "34:50", "ageGrade": 38.61, "pb": false, "weather": {"temp": 11.0, "rain": 0.0, "wind": 9.2, "gust": 21.6}}, {"date": "22/04/2023", "run": 353, "pos": 223, "time": "34:15", "ageGrade": 39.27, "pb": false, "weather": {"temp": 7.9, "rain": 0.0, "wind": 7.0, "gust": 16.9}}, {"date": "15/04/2023", "run": 352, "pos": 219, "time": "34:42", "ageGrade": 38.76, "pb": false, "weather": {"temp": 5.5, "rain": 0.0, "wind": 2.9, "gust": 13.7}}, {"date": "08/04/2023", "run": 351, "pos": 185, "time": "35:08", "ageGrade": 38.28, "pb": false, "weather": {"temp": 6.1, "rain": 0.0, "wind": 8.2, "gust": 18.4}}, {"date": "01/04/2023", "run": 350, "pos": 240, "time": "36:00", "ageGrade": 37.36, "pb": false, "weather": {"temp": 6.8, "rain": 0.0, "wind": 7.4, "gust": 16.6}}, {"date": "25/03/2023", "run": 349, "pos": 286, "time": "45:56", "ageGrade": 29.28, "pb": false, "weather": {"temp": 7.9, "rain": 2.7, "wind": 34.2, "gust": 60.5}}, {"date": "18/03/2023", "run": 348, "pos": 217, "time": "36:56", "ageGrade": 36.42, "pb": false, "weather": {"temp": 9.2, "rain": 0.0, "wind": 9.6, "gust": 19.1}}, {"date": "11/03/2023", "run": 347, "pos": 257, "time": "40:12", "ageGrade": 33.46, "pb": false, "weather": {"temp": -0.4, "rain": 0.0, "wind": 9.1, "gust": 18.0}}, {"date": "04/03/2023", "run": 346, "pos": 198, "time": "32:29", "ageGrade": 41.41, "pb": true, "weather": {"temp": 3.6, "rain": 0.0, "wind": 3.0, "gust": 8.6}}, {"date": "11/02/2023", "run": 343, "pos": 175, "time": "32:34", "ageGrade": 41.3, "pb": true, "weather": {"temp": 6.9, "rain": 0.0, "wind": 11.0, "gust": 18.4}}, {"date": "04/02/2023", "run": 342, "pos": 200, "time": "33:10", "ageGrade": 40.55, "pb": true, "weather": {"temp": 8.5, "rain": 0.0, "wind": 13.7, "gust": 23.4}}, {"date": "14/01/2023", "run": 340, "pos": 219, "time": "34:15", "ageGrade": 39.27, "pb": true, "weather": {"temp": 9.0, "rain": 0.0, "wind": 25.8, "gust": 45.4}}, {"date": "07/01/2023", "run": 339, "pos": 218, "time": "36:30", "ageGrade": 36.85, "pb": false, "weather": {"temp": 10.6, "rain": 0.4, "wind": 26.8, "gust": 54.0}}, {"date": "31/12/2022", "run": 337, "pos": 164, "time": "38:20", "ageGrade": 35.09, "pb": false, "weather": {"temp": 8.1, "rain": 1.1, "wind": 3.0, "gust": 8.3}}, {"date": "26/11/2022", "run": 333, "pos": 226, "time": "49:26", "ageGrade": 27.21, "pb": false, "weather": {"temp": 8.6, "rain": 0.5, "wind": 22.0, "gust": 37.8}}, {"date": "12/11/2022", "run": 331, "pos": 193, "time": "35:54", "ageGrade": 37.47, "pb": true, "weather": {"temp": 11.7, "rain": 0.0, "wind": 15.2, "gust": 28.1}}, {"date": "05/11/2022", "run": 330, "pos": 179, "time": "37:55", "ageGrade": 35.47, "pb": true, "weather": {"temp": 9.3, "rain": 0.0, "wind": 19.4, "gust": 34.2}}, {"date": "29/10/2022", "run": 329, "pos": 173, "time": "43:30", "ageGrade": 30.92, "pb": false, "weather": {"temp": 12.3, "rain": 0.8, "wind": 20.1, "gust": 37.1}}, {"date": "22/10/2022", "run": 328, "pos": 195, "time": "41:34", "ageGrade": 32.36, "pb": false, "weather": {"temp": 11.7, "rain": 0.0, "wind": 17.3, "gust": 31.3}}], "short": "Lee"}, {"id": "7939292", "name": "Sally BATES", "totalRuns": 133, "homeRuns": 133, "homeEvent": "Widnes", "ageCat": "VW35-39", "club100": false, "club250": false, "club500": false, "results": [{"date": "26/09/2026", "run": 527, "pos": 317, "time": "34:31", "ageGrade": 44.04, "pb": false, "weather": {"temp": 11.3, "rain": 0.0, "wind": 10.9, "gust": 23.0}}, {"date": "05/09/2026", "run": 524, "pos": 318, "time": "34:05", "ageGrade": 44.6, "pb": false, "weather": {"temp": 14.8, "rain": 0.1, "wind": 16.1, "gust": 37.4}}, {"date": "29/08/2026", "run": 523, "pos": 371, "time": "37:19", "ageGrade": 40.73, "pb": false, "weather": {"temp": 16.0, "rain": 0.2, "wind": 11.4, "gust": 25.6}}, {"date": "15/08/2026", "run": 521, "pos": 317, "time": "35:05", "ageGrade": 43.33, "pb": false, "weather": {"temp": 17.6, "rain": 0.0, "wind": 13.6, "gust": 32.8}}, {"date": "20/06/2026", "run": 513, "pos": 385, "time": "34:01", "ageGrade": 44.68, "pb": false, "weather": {"temp": 17.8, "rain": 0.0, "wind": 11.3, "gust": 30.6}}, {"date": "13/06/2026", "run": 512, "pos": 243, "time": "29:29", "ageGrade": 51.55, "pb": true, "weather": {"temp": 13.4, "rain": 0.1, "wind": 27.2, "gust": 60.8}}, {"date": "06/06/2026", "run": 511, "pos": 341, "time": "30:24", "ageGrade": 50.0, "pb": false, "weather": {"temp": 13.4, "rain": 0.1, "wind": 25.4, "gust": 61.6}}, {"date": "30/05/2026", "run": 510, "pos": 299, "time": "32:22", "ageGrade": 46.96, "pb": false, "weather": {"temp": 15.2, "rain": 0.0, "wind": 4.1, "gust": 16.6}}, {"date": "23/05/2026", "run": 509, "pos": 341, "time": "33:01", "ageGrade": 46.04, "pb": false, "weather": {"temp": 15.3, "rain": 0.1, "wind": 8.6, "gust": 23.8}}, {"date": "16/05/2026", "run": 508, "pos": 404, "time": "32:22", "ageGrade": 46.96, "pb": false, "weather": {"temp": 9.6, "rain": 0.1, "wind": 8.0, "gust": 20.9}}, {"date": "02/05/2026", "run": 507, "pos": 331, "time": "31:27", "ageGrade": 48.33, "pb": false, "weather": {"temp": 11.3, "rain": 0.0, "wind": 4.3, "gust": 16.2}}, {"date": "25/04/2026", "run": 506, "pos": 303, "time": "32:03", "ageGrade": 47.43, "pb": false, "weather": {"temp": 9.1, "rain": 0.0, "wind": 3.3, "gust": 13.3}}, {"date": "18/04/2026", "run": 505, "pos": 300, "time": "31:40", "ageGrade": 48.0, "pb": false, "weather": {"temp": 10.1, "rain": 0.0, "wind": 17.9, "gust": 40.0}}, {"date": "11/04/2026", "run": 504, "pos": 335, "time": "31:50", "ageGrade": 47.75, "pb": false, "weather": {"temp": 5.8, "rain": 0.0, "wind": 14.1, "gust": 29.9}}, {"date": "04/04/2026", "run": 503, "pos": 337, "time": "32:15", "ageGrade": 47.13, "pb": false, "weather": {"temp": 6.9, "rain": 0.0, "wind": 9.5, "gust": 21.6}}, {"date": "28/03/2026", "run": 502, "pos": 341, "time": "32:48", "ageGrade": 46.34, "pb": false, "weather": {"temp": 5.1, "rain": 0.4, "wind": 21.2, "gust": 54.7}}, {"date": "21/03/2026", "run": 501, "pos": 362, "time": "34:20", "ageGrade": 44.27, "pb": false, "weather": {"temp": 4.8, "rain": 0.0, "wind": 1.6, "gust": 9.4}}, {"date": "14/03/2026", "run": 500, "pos": 464, "time": "33:07", "ageGrade": 45.9, "pb": false, "weather": {"temp": 4.9, "rain": 0.0, "wind": 9.0, "gust": 17.6}}, {"date": "07/03/2026", "run": 499, "pos": 286, "time": "31:33", "ageGrade": 48.18, "pb": false, "weather": {"temp": 5.1, "rain": 0.0, "wind": 4.5, "gust": 12.2}}, {"date": "28/02/2026", "run": 498, "pos": 362, "time": "31:42", "ageGrade": 47.95, "pb": false, "weather": {"temp": 5.5, "rain": 0.2, "wind": 9.2, "gust": 19.8}}, {"date": "07/02/2026", "run": 495, "pos": 298, "time": "31:02", "ageGrade": 48.98, "pb": false, "weather": {"temp": 5.3, "rain": 0.0, "wind": 13.9, "gust": 28.4}}, {"date": "31/01/2026", "run": 494, "pos": 286, "time": "31:50", "ageGrade": 47.75, "pb": false, "weather": {"temp": 6.8, "rain": 0.0, "wind": 19.4, "gust": 44.3}}, {"date": "13/12/2025", "run": 486, "pos": 214, "time": "31:47", "ageGrade": 47.61, "pb": false, "weather": {"temp": 4.3, "rain": 0.0, "wind": 13.5, "gust": 27.4}}, {"date": "06/12/2025", "run": 485, "pos": 218, "time": "33:10", "ageGrade": 45.63, "pb": false, "weather": {"temp": 7.9, "rain": 0.0, "wind": 12.2, "gust": 26.3}}, {"date": "29/11/2025", "run": 484, "pos": 210, "time": "32:28", "ageGrade": 46.61, "pb": false, "weather": {"temp": 4.9, "rain": 0.0, "wind": 0.8, "gust": 4.3}}, {"date": "15/11/2025", "run": 483, "pos": 276, "time": "32:30", "ageGrade": 46.56, "pb": false, "weather": {"temp": 8.8, "rain": 0.0, "wind": 18.7, "gust": 45.0}}, {"date": "08/11/2025", "run": 482, "pos": 319, "time": "33:06", "ageGrade": 45.72, "pb": false, "weather": {"temp": 11.4, "rain": 0.0, "wind": 12.4, "gust": 24.8}}, {"date": "25/10/2025", "run": 480, "pos": 258, "time": "31:36", "ageGrade": 47.89, "pb": false, "weather": {"temp": 8.9, "rain": 0.0, "wind": 16.2, "gust": 35.3}}, {"date": "11/10/2025", "run": 478, "pos": 253, "time": "34:46", "ageGrade": 43.53, "pb": false, "weather": {"temp": 11.8, "rain": 0.0, "wind": 4.0, "gust": 10.1}}, {"date": "27/09/2025", "run": 476, "pos": 246, "time": "31:28", "ageGrade": 48.09, "pb": false, "weather": {"temp": 11.0, "rain": 0.0, "wind": 12.1, "gust": 30.2}}, {"date": "20/09/2025", "run": 475, "pos": 267, "time": "32:49", "ageGrade": 46.11, "pb": false, "weather": {"temp": 15.5, "rain": 1.2, "wind": 5.4, "gust": 14.4}}, {"date": "13/09/2025", "run": 474, "pos": 302, "time": "33:48", "ageGrade": 44.77, "pb": false, "weather": {"temp": 11.6, "rain": 0.0, "wind": 10.8, "gust": 27.0}}, {"date": "30/08/2025", "run": 472, "pos": 316, "time": "34:17", "ageGrade": 44.14, "pb": false, "weather": {"temp": 15.3, "rain": 0.0, "wind": 12.8, "gust": 32.0}}, {"date": "02/08/2025", "run": 468, "pos": 313, "time": "34:24", "ageGrade": 43.99, "pb": false, "weather": {"temp": 15.7, "rain": 0.0, "wind": 14.6, "gust": 34.6}}, {"date": "26/07/2025", "run": 467, "pos": 314, "time": "35:05", "ageGrade": 43.14, "pb": false, "weather": {"temp": 17.7, "rain": 0.1, "wind": 11.8, "gust": 30.6}}, {"date": "05/07/2025", "run": 464, "pos": 252, "time": "31:21", "ageGrade": 48.27, "pb": false, "weather": {"temp": 17.8, "rain": 0.1, "wind": 17.6, "gust": 40.0}}, {"date": "31/05/2025", "run": 459, "pos": 406, "time": "38:23", "ageGrade": 39.43, "pb": false, "weather": {"temp": 17.0, "rain": 0.0, "wind": 17.4, "gust": 40.7}}, {"date": "10/05/2025", "run": 456, "pos": 260, "time": "31:22", "ageGrade": 48.25, "pb": false, "weather": {"temp": 13.2, "rain": 0.0, "wind": 4.8, "gust": 18.7}}, {"date": "03/05/2025", "run": 455, "pos": 304, "time": "32:14", "ageGrade": 46.95, "pb": false, "weather": {"temp": 12.1, "rain": 0.0, "wind": 18.6, "gust": 42.8}}, {"date": "26/04/2025", "run": 454, "pos": 318, "time": "32:55", "ageGrade": 45.97, "pb": false, "weather": {"temp": 10.4, "rain": 0.1, "wind": 9.9, "gust": 24.5}}, {"date": "19/04/2025", "run": 453, "pos": 327, "time": "34:25", "ageGrade": 43.97, "pb": false, "weather": {"temp": 9.8, "rain": 0.0, "wind": 16.1, "gust": 39.2}}, {"date": "15/02/2025", "run": 444, "pos": 208, "time": "31:36", "ageGrade": 47.89, "pb": false, "weather": {"temp": 3.1, "rain": 0.0, "wind": 10.0, "gust": 23.0}}, {"date": "08/02/2025", "run": 443, "pos": 233, "time": "31:01", "ageGrade": 48.79, "pb": false, "weather": {"temp": 1.6, "rain": 0.0, "wind": 9.2, "gust": 18.7}}, {"date": "18/01/2025", "run": 441, "pos": 264, "time": "32:23", "ageGrade": 46.73, "pb": false, "weather": {"temp": 1.6, "rain": 0.0, "wind": 10.9, "gust": 23.0}}, {"date": "04/01/2025", "run": 440, "pos": 320, "time": "32:59", "ageGrade": 45.88, "pb": false, "weather": {"temp": 0.4, "rain": 0.0, "wind": 6.8, "gust": 14.4}}, {"date": "28/12/2024", "run": 439, "pos": 299, "time": "34:21", "ageGrade": 44.06, "pb": false, "weather": {"temp": 4.5, "rain": 0.0, "wind": 3.8, "gust": 10.1}}, {"date": "14/12/2024", "run": 436, "pos": 207, "time": "36:39", "ageGrade": 41.06, "pb": false, "weather": {"temp": 5.1, "rain": 0.0, "wind": 9.8, "gust": 22.7}}, {"date": "23/11/2024", "run": 434, "pos": 211, "time": "32:25", "ageGrade": 46.43, "pb": false, "weather": {"temp": 4.4, "rain": 1.6, "wind": 34.6, "gust": 68.8}}, {"date": "16/11/2024", "run": 433, "pos": 311, "time": "32:19", "ageGrade": 46.57, "pb": false, "weather": {"temp": 11.3, "rain": 0.8, "wind": 15.3, "gust": 37.1}}, {"date": "09/11/2024", "run": 432, "pos": 273, "time": "33:34", "ageGrade": 44.84, "pb": false, "weather": {"temp": 5.7, "rain": 0.0, "wind": 5.8, "gust": 11.5}}, {"date": "12/10/2024", "run": 428, "pos": 301, "time": "34:48", "ageGrade": 43.25, "pb": false, "weather": {"temp": 7.0, "rain": 0.0, "wind": 7.5, "gust": 14.8}}, {"date": "05/10/2024", "run": 427, "pos": 259, "time": "33:11", "ageGrade": 45.35, "pb": false, "weather": {"temp": 9.0, "rain": 0.0, "wind": 15.7, "gust": 30.6}}, {"date": "21/09/2024", "run": 425, "pos": 307, "time": "34:44", "ageGrade": 43.33, "pb": false, "weather": {"temp": 14.8, "rain": 0.0, "wind": 23.6, "gust": 43.9}}, {"date": "14/09/2024", "run": 424, "pos": 264, "time": "33:40", "ageGrade": 44.7, "pb": false, "weather": {"temp": 13.7, "rain": 0.0, "wind": 11.9, "gust": 26.3}}, {"date": "07/09/2024", "run": 423, "pos": 290, "time": "36:13", "ageGrade": 41.56, "pb": false, "weather": {"temp": 17.3, "rain": 0.0, "wind": 15.3, "gust": 33.1}}, {"date": "24/08/2024", "run": 421, "pos": 273, "time": "35:16", "ageGrade": 42.67, "pb": false, "weather": {"temp": 14.4, "rain": 0.2, "wind": 15.4, "gust": 31.0}}, {"date": "10/08/2024", "run": 419, "pos": 305, "time": "33:16", "ageGrade": 45.24, "pb": false, "weather": {"temp": 17.2, "rain": 0.1, "wind": 13.1, "gust": 24.1}}, {"date": "03/08/2024", "run": 418, "pos": 225, "time": "33:22", "ageGrade": 45.1, "pb": false, "weather": {"temp": 16.0, "rain": 0.0, "wind": 16.9, "gust": 32.0}}, {"date": "27/07/2024", "run": 417, "pos": 309, "time": "46:50", "ageGrade": 32.14, "pb": false, "weather": {"temp": 15.6, "rain": 0.0, "wind": 11.1, "gust": 24.1}}, {"date": "20/07/2024", "run": 416, "pos": 279, "time": "35:54", "ageGrade": 41.92, "pb": false, "weather": {"temp": 19.2, "rain": 0.0, "wind": 10.8, "gust": 22.3}}, {"date": "13/07/2024", "run": 415, "pos": 344, "time": "39:18", "ageGrade": 38.3, "pb": false, "weather": {"temp": 14.8, "rain": 0.2, "wind": 15.2, "gust": 28.8}}, {"date": "06/07/2024", "run": 414, "pos": 200, "time": "32:13", "ageGrade": 46.71, "pb": false, "weather": {"temp": 11.8, "rain": 0.5, "wind": 15.3, "gust": 31.0}}, {"date": "15/06/2024", "run": 411, "pos": 294, "time": "34:34", "ageGrade": 43.54, "pb": false, "weather": {"temp": 12.5, "rain": 0.0, "wind": 7.8, "gust": 21.2}}, {"date": "08/06/2024", "run": 410, "pos": 419, "time": "39:30", "ageGrade": 38.1, "pb": false, "weather": {"temp": 11.1, "rain": 0.0, "wind": 23.5, "gust": 45.0}}, {"date": "25/05/2024", "run": 408, "pos": 256, "time": "32:29", "ageGrade": 46.33, "pb": false, "weather": {"temp": 13.4, "rain": 0.0, "wind": 7.8, "gust": 19.8}}, {"date": "18/05/2024", "run": 407, "pos": 367, "time": "47:05", "ageGrade": 31.96, "pb": false, "weather": {"temp": 14.9, "rain": 0.0, "wind": 6.5, "gust": 16.9}}, {"date": "11/05/2024", "run": 406, "pos": 361, "time": "42:09", "ageGrade": 35.71, "pb": false, "weather": {"temp": 16.7, "rain": 0.0, "wind": 12.1, "gust": 26.3}}, {"date": "04/05/2024", "run": 405, "pos": 366, "time": "40:10", "ageGrade": 37.47, "pb": false, "weather": {"temp": 10.6, "rain": 0.1, "wind": 12.3, "gust": 22.7}}, {"date": "27/04/2024", "run": 404, "pos": 353, "time": "43:41", "ageGrade": 34.45, "pb": false, "weather": {"temp": 7.4, "rain": 0.0, "wind": 17.6, "gust": 34.9}}, {"date": "20/04/2024", "run": 403, "pos": 331, "time": "40:45", "ageGrade": 36.93, "pb": false, "weather": {"temp": 7.5, "rain": 0.0, "wind": 3.8, "gust": 13.7}}, {"date": "13/04/2024", "run": 402, "pos": 383, "time": "35:31", "ageGrade": 42.37, "pb": false, "weather": {"temp": 12.9, "rain": 0.0, "wind": 19.9, "gust": 38.2}}, {"date": "30/03/2024", "run": 400, "pos": 394, "time": "40:44", "ageGrade": 36.95, "pb": false, "weather": {"temp": 6.7, "rain": 0.0, "wind": 13.4, "gust": 27.4}}, {"date": "23/03/2024", "run": 399, "pos": 265, "time": "38:23", "ageGrade": 39.21, "pb": false, "weather": {"temp": 4.4, "rain": 2.0, "wind": 32.5, "gust": 64.1}}, {"date": "16/03/2024", "run": 398, "pos": 354, "time": "48:11", "ageGrade": 31.23, "pb": false, "weather": {"temp": 3.3, "rain": 0.0, "wind": 10.5, "gust": 23.4}}, {"date": "09/03/2024", "run": 397, "pos": 216, "time": "31:02", "ageGrade": 48.5, "pb": false, "weather": {"temp": 5.4, "rain": 0.1, "wind": 28.1, "gust": 48.6}}, {"date": "02/03/2024", "run": 396, "pos": 222, "time": "30:18", "ageGrade": 49.67, "pb": true, "weather": {"temp": 1.2, "rain": 0.0, "wind": 12.4, "gust": 23.0}}, {"date": "24/02/2024", "run": 395, "pos": 305, "time": "32:02", "ageGrade": 46.98, "pb": false, "weather": {"temp": -0.2, "rain": 0.0, "wind": 6.8, "gust": 15.1}}, {"date": "17/02/2024", "run": 394, "pos": 234, "time": "32:25", "ageGrade": 46.43, "pb": false, "weather": {"temp": 9.6, "rain": 0.0, "wind": 12.0, "gust": 21.2}}, {"date": "10/02/2024", "run": 393, "pos": 322, "time": "34:54", "ageGrade": 43.12, "pb": false, "weather": {"temp": 4.7, "rain": 0.0, "wind": 9.7, "gust": 18.0}}, {"date": "03/02/2024", "run": 392, "pos": 342, "time": "42:23", "ageGrade": 35.51, "pb": false, "weather": {"temp": 10.9, "rain": 0.0, "wind": 29.9, "gust": 53.6}}, {"date": "13/01/2024", "run": 390, "pos": 255, "time": "31:50", "ageGrade": 47.28, "pb": false, "weather": {"temp": 4.8, "rain": 0.0, "wind": 9.1, "gust": 15.5}}, {"date": "01/01/2024", "run": 389, "pos": 348, "time": "41:30", "ageGrade": 36.27, "pb": false, "weather": {"temp": 6.2, "rain": 0.0, "wind": 26.8, "gust": 55.1}}, {"date": "30/12/2023", "run": 388, "pos": 262, "time": "43:03", "ageGrade": 34.96, "pb": false, "weather": {"temp": 4.6, "rain": 0.4, "wind": 18.8, "gust": 36.0}}, {"date": "23/12/2023", "run": 386, "pos": 222, "time": "30:27", "ageGrade": 49.43, "pb": true, "weather": {"temp": 9.9, "rain": 0.1, "wind": 32.8, "gust": 58.0}}, {"date": "16/12/2023", "run": 385, "pos": 244, "time": "44:58", "ageGrade": 33.36, "pb": false, "weather": {"temp": 9.9, "rain": 0.0, "wind": 14.8, "gust": 26.3}}, {"date": "09/12/2023", "run": 384, "pos": 157, "time": "30:35", "ageGrade": 49.05, "pb": true, "weather": {"temp": 8.4, "rain": 5.7, "wind": 29.2, "gust": 52.6}}, {"date": "25/11/2023", "run": 383, "pos": 289, "time": "40:26", "ageGrade": 37.1, "pb": false, "weather": {"temp": 2.0, "rain": 0.0, "wind": 4.3, "gust": 9.7}}, {"date": "18/11/2023", "run": 382, "pos": 285, "time": "41:24", "ageGrade": 36.23, "pb": false, "weather": {"temp": 11.6, "rain": 0.0, "wind": 20.9, "gust": 38.5}}, {"date": "11/11/2023", "run": 381, "pos": 310, "time": "41:37", "ageGrade": 36.04, "pb": false, "weather": {"temp": 3.0, "rain": 0.0, "wind": 9.3, "gust": 15.1}}, {"date": "04/11/2023", "run": 380, "pos": 351, "time": "40:32", "ageGrade": 37.01, "pb": false, "weather": {"temp": 5.8, "rain": 0.0, "wind": 15.5, "gust": 28.1}}, {"date": "21/10/2023", "run": 378, "pos": 272, "time": "32:48", "ageGrade": 45.73, "pb": false, "weather": {"temp": 8.5, "rain": 0.0, "wind": 12.5, "gust": 22.0}}, {"date": "07/10/2023", "run": 377, "pos": 247, "time": "48:37", "ageGrade": 30.85, "pb": false, "weather": {"temp": 15.5, "rain": 0.0, "wind": 11.3, "gust": 20.9}}, {"date": "30/09/2023", "run": 376, "pos": 188, "time": "32:05", "ageGrade": 46.75, "pb": false, "weather": {"temp": 11.8, "rain": 0.0, "wind": 10.7, "gust": 19.1}}, {"date": "23/09/2023", "run": 375, "pos": 296, "time": "52:56", "ageGrade": 28.34, "pb": false, "weather": {"temp": 12.4, "rain": 0.2, "wind": 12.8, "gust": 27.7}}, {"date": "16/09/2023", "run": 374, "pos": 194, "time": "32:42", "ageGrade": 45.87, "pb": false, "weather": {"temp": 15.9, "rain": 0.0, "wind": 20.2, "gust": 36.7}}, {"date": "09/09/2023", "run": 373, "pos": 177, "time": "34:28", "ageGrade": 43.52, "pb": false, "weather": {"temp": 18.5, "rain": 0.0, "wind": 3.3, "gust": 13.7}}, {"date": "02/09/2023", "run": 372, "pos": 184, "time": "32:45", "ageGrade": 45.8, "pb": false, "weather": {"temp": 16.3, "rain": 0.0, "wind": 8.8, "gust": 19.1}}, {"date": "26/08/2023", "run": 371, "pos": 252, "time": "32:54", "ageGrade": 45.59, "pb": false, "weather": {"temp": 13.6, "rain": 0.1, "wind": 13.1, "gust": 26.3}}, {"date": "19/08/2023", "run": 370, "pos": 217, "time": "33:05", "ageGrade": 45.34, "pb": false, "weather": {"temp": 19.0, "rain": 0.0, "wind": 27.0, "gust": 50.8}}, {"date": "12/08/2023", "run": 369, "pos": 220, "time": "34:20", "ageGrade": 43.69, "pb": false, "weather": {"temp": 17.6, "rain": 0.1, "wind": 21.9, "gust": 50.0}}, {"date": "05/08/2023", "run": 368, "pos": 134, "time": "32:38", "ageGrade": 45.97, "pb": false, "weather": {"temp": 12.4, "rain": 2.5, "wind": 18.8, "gust": 33.8}}, {"date": "29/07/2023", "run": 367, "pos": 189, "time": "32:56", "ageGrade": 45.55, "pb": false, "weather": {"temp": 16.4, "rain": 0.1, "wind": 17.6, "gust": 37.1}}, {"date": "22/07/2023", "run": 366, "pos": 144, "time": "32:37", "ageGrade": 45.99, "pb": false, "weather": {"temp": 13.9, "rain": 1.2, "wind": 18.4, "gust": 32.4}}, {"date": "15/07/2023", "run": 365, "pos": 284, "time": "33:54", "ageGrade": 44.25, "pb": false, "weather": {"temp": 17.1, "rain": 0.0, "wind": 26.8, "gust": 51.5}}, {"date": "08/07/2023", "run": 364, "pos": 225, "time": "34:22", "ageGrade": 43.65, "pb": false, "weather": {"temp": 22.5, "rain": 0.0, "wind": 22.1, "gust": 41.0}}, {"date": "01/07/2023", "run": 363, "pos": 174, "time": "32:44", "ageGrade": 45.82, "pb": false, "weather": {"temp": 15.9, "rain": 0.1, "wind": 32.8, "gust": 59.8}}, {"date": "10/06/2023", "run": 360, "pos": 228, "time": "36:05", "ageGrade": 41.57, "pb": false, "weather": {"temp": 17.9, "rain": 0.0, "wind": 11.1, "gust": 24.1}}, {"date": "03/06/2023", "run": 359, "pos": 184, "time": "31:51", "ageGrade": 47.1, "pb": true, "weather": {"temp": 12.1, "rain": 0.0, "wind": 5.6, "gust": 17.3}}, {"date": "27/05/2023", "run": 358, "pos": 209, "time": "33:16", "ageGrade": 45.09, "pb": false, "weather": {"temp": 13.6, "rain": 0.0, "wind": 9.6, "gust": 22.0}}, {"date": "20/05/2023", "run": 357, "pos": 344, "time": "33:07", "ageGrade": 45.29, "pb": false, "weather": {"temp": 12.6, "rain": 0.0, "wind": 5.1, "gust": 15.5}}, {"date": "13/05/2023", "run": 356, "pos": 218, "time": "32:38", "ageGrade": 45.97, "pb": false, "weather": {"temp": 10.4, "rain": 0.0, "wind": 6.0, "gust": 17.3}}, {"date": "06/05/2023", "run": 355, "pos": 238, "time": "32:08", "ageGrade": 46.68, "pb": true, "weather": {"temp": 12.3, "rain": 0.1, "wind": 15.5, "gust": 29.9}}, {"date": "29/04/2023", "run": 354, "pos": 173, "time": "32:10", "ageGrade": 46.63, "pb": true, "weather": {"temp": 11.0, "rain": 0.0, "wind": 9.2, "gust": 21.6}}, {"date": "22/04/2023", "run": 353, "pos": 214, "time": "33:25", "ageGrade": 44.89, "pb": false, "weather": {"temp": 7.9, "rain": 0.0, "wind": 7.0, "gust": 16.9}}, {"date": "15/04/2023", "run": 352, "pos": 187, "time": "32:21", "ageGrade": 46.37, "pb": true, "weather": {"temp": 5.5, "rain": 0.0, "wind": 2.9, "gust": 13.7}}, {"date": "08/04/2023", "run": 351, "pos": 167, "time": "32:46", "ageGrade": 45.78, "pb": true, "weather": {"temp": 6.1, "rain": 0.0, "wind": 8.2, "gust": 18.4}}, {"date": "01/04/2023", "run": 350, "pos": 218, "time": "32:58", "ageGrade": 45.5, "pb": true, "weather": {"temp": 6.8, "rain": 0.0, "wind": 7.4, "gust": 16.6}}, {"date": "25/03/2023", "run": 349, "pos": 222, "time": "33:36", "ageGrade": 44.64, "pb": false, "weather": {"temp": 7.9, "rain": 2.7, "wind": 34.2, "gust": 60.5}}, {"date": "18/03/2023", "run": 348, "pos": 184, "time": "33:36", "ageGrade": 44.64, "pb": false, "weather": {"temp": 9.2, "rain": 0.0, "wind": 9.6, "gust": 19.1}}, {"date": "11/03/2023", "run": 347, "pos": 221, "time": "33:17", "ageGrade": 45.07, "pb": true, "weather": {"temp": -0.4, "rain": 0.0, "wind": 9.1, "gust": 18.0}}, {"date": "04/03/2023", "run": 346, "pos": 217, "time": "33:58", "ageGrade": 44.16, "pb": true, "weather": {"temp": 3.6, "rain": 0.0, "wind": 3.0, "gust": 8.6}}, {"date": "11/02/2023", "run": 343, "pos": 202, "time": "35:15", "ageGrade": 42.55, "pb": false, "weather": {"temp": 6.9, "rain": 0.0, "wind": 11.0, "gust": 18.4}}, {"date": "04/02/2023", "run": 342, "pos": 214, "time": "34:29", "ageGrade": 43.5, "pb": true, "weather": {"temp": 8.5, "rain": 0.0, "wind": 13.7, "gust": 23.4}}, {"date": "14/01/2023", "run": 340, "pos": 223, "time": "34:40", "ageGrade": 43.27, "pb": true, "weather": {"temp": 9.0, "rain": 0.0, "wind": 25.8, "gust": 45.4}}, {"date": "07/01/2023", "run": 339, "pos": 219, "time": "36:41", "ageGrade": 40.89, "pb": false, "weather": {"temp": 10.6, "rain": 0.4, "wind": 26.8, "gust": 54.0}}, {"date": "31/12/2022", "run": 337, "pos": 162, "time": "37:32", "ageGrade": 39.96, "pb": false, "weather": {"temp": 8.1, "rain": 1.1, "wind": 3.0, "gust": 8.3}}, {"date": "26/11/2022", "run": 333, "pos": 194, "time": "36:19", "ageGrade": 41.17, "pb": true, "weather": {"temp": 8.6, "rain": 0.5, "wind": 22.0, "gust": 37.8}}, {"date": "19/11/2022", "run": 332, "pos": 232, "time": "38:02", "ageGrade": 39.31, "pb": false, "weather": {"temp": 4.0, "rain": 0.0, "wind": 8.0, "gust": 13.7}}, {"date": "12/11/2022", "run": 331, "pos": 199, "time": "37:12", "ageGrade": 40.19, "pb": true, "weather": {"temp": 11.7, "rain": 0.0, "wind": 15.2, "gust": 28.1}}, {"date": "05/11/2022", "run": 330, "pos": 186, "time": "39:21", "ageGrade": 37.99, "pb": true, "weather": {"temp": 9.3, "rain": 0.0, "wind": 19.4, "gust": 34.2}}, {"date": "29/10/2022", "run": 329, "pos": 172, "time": "43:30", "ageGrade": 34.37, "pb": false, "weather": {"temp": 12.3, "rain": 0.8, "wind": 20.1, "gust": 37.1}}, {"date": "22/10/2022", "run": 328, "pos": 197, "time": "41:38", "ageGrade": 35.91, "pb": true, "weather": {"temp": 11.7, "rain": 0.0, "wind": 17.3, "gust": 31.3}}, {"date": "15/10/2022", "run": 327, "pos": 204, "time": "48:31", "ageGrade": 30.81, "pb": false, "weather": {"temp": 10.8, "rain": 0.0, "wind": 19.5, "gust": 38.5}}], "short": "Sally"}]};
 let activeRunner = 0;
 
 Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
@@ -177,6 +274,26 @@ function parseDate(d) { const [dd,mm,yy] = d.split('/'); return new Date(+yy, +m
 function toSeconds(t) { const p = t.split(':').map(Number); return p.length===3 ? p[0]*3600+p[1]*60+p[2] : p[0]*60+p[1]; }
 function fmtTime(s) { const m = Math.floor(s/60), sec = Math.round(s%60); return m + ':' + String(sec).padStart(2,'0'); }
 function fmtGap(s) { return s < 60 ? Math.round(s) + 's' : fmtTime(s); }
+const fmtMonth = d => d.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+const CLUBS = [25, 50, 100, 250, 500];
+
+// Runs per week over the 12 months to the latest run. Results only hold the
+// home event, which for this family is every run.
+function attendance(runner) {
+  const ds = runner.results.map(r => parseDate(r.date));
+  if (!ds.length) return { rate: 0, runs: 0, last: null };
+  const last = new Date(Math.max(...ds)), from = new Date(last);
+  from.setFullYear(from.getFullYear() - 1);
+  const runs = ds.filter(d => d > from).length;
+  return { rate: runs / (365 / 7), runs, last };
+}
+// When a milestone shirt should arrive if the last 12 months' turnout holds.
+function milestoneEta(runner, n) {
+  const left = n - runner.totalRuns;
+  const { rate, last } = attendance(runner);
+  if (left <= 0 || !rate) return null;
+  return new Date(last.getTime() + (left / rate) * 7 * 86400000);
+}
 function fmtLong(s) { const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = Math.round(s%60); return (h ? h+':' + String(m).padStart(2,'0') : m) + ':' + String(sec).padStart(2,'0'); }
 
 // switcher buttons
@@ -198,7 +315,83 @@ if (PAYLOAD.runners.length >= 2) {
 }
 
 let chartInstances = [];
-function destroyCharts() { chartInstances.forEach(c => c.destroy()); chartInstances = []; }
+function destroyCharts() { chartInstances.forEach(c => c.destroy()); chartInstances = []; stopReplay(); }
+
+// Race replay: two dots run a 5k at even pace and cross the line in the real
+// finish times. Plays once when it first scrolls into view.
+let replayRaf = 0, replayObserver = null;
+function stopReplay() {
+  cancelAnimationFrame(replayRaf); replayRaf = 0;
+  if (replayObserver) { replayObserver.disconnect(); replayObserver = null; }
+}
+function setupReplay(runners, days, closest, biggest) {
+  const $ = id => document.getElementById(id);
+  const card = document.querySelector('.replay');
+  const lanes = [...card.querySelectorAll('.lane:not(.kms)')];
+  const pick = $('replayPick');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const presets = { latest: days[days.length - 1], closest: closest || days[days.length - 1], biggest: biggest || days[days.length - 1] };
+  const byDate = new Map(days.map(d => [d.date, d]));
+  pick.innerHTML = [...days].reverse().map(d => `<option value="${d.date}">${d.date}</option>`).join('');
+  const metres = m => (m < 10 ? m.toFixed(1) : Math.round(m)) + ' m';
+  const who = i => `<b style="color:var(--r${i}-text)">${runners[i].short}</b>`;
+  let race;
+
+  function draw(t) {
+    const T = race.runs.map(r => r.seconds), pos = T.map(x => Math.min(1, t / x));
+    lanes.forEach((lane, i) => {
+      lane.querySelector('.runner').style.left = (pos[i] * 100) + '%';
+      lane.querySelector('.lane-time').textContent = pos[i] >= 1 ? race.runs[i].time : '';
+    });
+    $('replayClock').textContent = fmtTime(Math.min(t, Math.max(...T)));
+    const lead = T[0] === T[1] ? -1 : T[0] < T[1] ? 0 : 1, trail = 1 - lead;
+    $('replayStatus').innerHTML =
+        t <= 0 ? `${race.date}: ${race.runs.map((r, i) => who(i) + ' ' + r.time).join(' vs ')}`
+      : pos.every(p => p >= 1)
+        ? (lead < 0 ? `🤝 Dead heat, side by side over the line in ${race.runs[0].time}`
+                    : `🏁 ${who(lead)} wins by ${fmtGap(T[trail] - T[lead])}, about ${metres(5000 * (1 - T[lead] / T[trail]))}`)
+      : lead >= 0 && pos[lead] >= 1 ? `${who(lead)} is home. ${runners[trail].short} has ${metres(5000 * (1 - pos[trail]))} to go`
+      : lead < 0 ? 'Neck and neck…'
+      : `${who(lead)} leads by ${metres(5000 * (pos[lead] - pos[trail]))} · ${(pos[lead] * 5).toFixed(1)} km gone`;
+  }
+  function play() {
+    cancelAnimationFrame(replayRaf);
+    const T = race.runs.map(r => r.seconds), tEnd = Math.max(...T), tFirst = Math.min(...T);
+    if (reduce) { draw(tEnd); return; }
+    const speed = tFirst / 6000;   // the leader finishes about six seconds in
+    let t = 0, prev = performance.now();
+    $('replayPlay').textContent = '↻ Restart';
+    const step = now => {
+      const dt = Math.min(now - prev, 50); prev = now;
+      // photo finish: the last 3% of a close race plays at a sixth of the speed
+      const slow = tEnd - tFirst < 15 && t > tFirst * 0.97;
+      t = Math.min(tEnd, t + dt * speed * (slow ? 1 / 6 : 1));
+      draw(t);
+      if (t < tEnd) replayRaf = requestAnimationFrame(step);
+      else { replayRaf = 0; $('replayPlay').textContent = '↻ Again'; }
+    };
+    replayRaf = requestAnimationFrame(step);
+  }
+  function setRace(d, autoplay) {
+    race = d; pick.value = d.date;
+    card.querySelectorAll('.btn[data-pick]').forEach(b => b.classList.toggle('active', presets[b.dataset.pick].date === d.date));
+    cancelAnimationFrame(replayRaf); replayRaf = 0;
+    $('replayPlay').textContent = '▶ Replay';
+    draw(0);
+    if (autoplay) play();
+  }
+  card.querySelectorAll('.btn[data-pick]').forEach(b => b.onclick = () => setRace(presets[b.dataset.pick], true));
+  pick.onchange = () => setRace(byDate.get(pick.value), true);
+  $('replayPlay').onclick = play;
+  setRace(presets.latest, false);
+  if ('IntersectionObserver' in window && !reduce) {
+    replayObserver = new IntersectionObserver(es => {
+      if (!es.some(e => e.isIntersecting)) return;
+      replayObserver.disconnect(); replayObserver = null; play();
+    }, { threshold: 0.6 });
+    replayObserver.observe(card);
+  }
+}
 
 let COLORS = ['#2b233d', '#ff4d6d', '#00b6c4', '#ffa300'];
 
@@ -282,6 +475,7 @@ function renderH2H() {
   }
 
   app.innerHTML = `
+    ${wrappedBanner()}
     ${sharedDays.length ? `
     <div class="card" style="background:linear-gradient(135deg,#2b233d,#4f3d80); color:white; margin-bottom:14px; border:0;">
       <div class="eyebrow">Head-to-head wins · ${sharedDays.length} run together</div>
@@ -303,6 +497,28 @@ function renderH2H() {
       </div>
     </div>` : ''}
 
+    ${sharedDays.length ? `
+    <div class="card replay" style="margin-bottom:14px;">
+      <div class="replay-head">
+        <h2>Race replay</h2>
+        <div class="controls">
+          <button class="btn" data-pick="latest">Latest</button>
+          <button class="btn" data-pick="closest">Closest</button>
+          <button class="btn" data-pick="biggest">Biggest gap</button>
+          <select class="btn" id="replayPick" aria-label="Pick a parkrun to replay"></select>
+        </div>
+      </div>
+      ${runners.map((r, i) => `<div class="lane"><span class="lane-name" style="color:var(--r${i}-text)">${r.short}</span>
+        <div class="lane-line"><i class="runner" style="background:var(--r${i}-text)"></i></div><span class="lane-time"></span></div>`).join('')}
+      <div class="lane kms"><span></span><div class="lane-line">${[0,1,2,3,4,5].map(k => `<span style="left:${k*20}%">${k === 5 ? '5k' : k}</span>`).join('')}</div><span></span></div>
+      <div class="replay-foot">
+        <button class="play" id="replayPlay" type="button">▶ Replay</button>
+        <div class="replay-clock display" id="replayClock">0:00</div>
+        <div class="replay-status" id="replayStatus"></div>
+      </div>
+      <div class="replay-note">Even pace assumed: parkrun only publishes finish times, not splits.</div>
+    </div>` : ''}
+
     <div class="card" style="margin-bottom:14px;">
       <h2>Head-to-head stats</h2>
       <table style="width:100%; font-size:14px;">
@@ -322,6 +538,9 @@ function renderH2H() {
           ${cmpRow('Avg age grade', stats.map(s => s.avgAG), v => v.toFixed(2) + '%', 'higher')}
           ${cmpRow('Best finish position', stats.map(s => s.bestPos), v => '#' + v.pos)}
           ${cmpRow('PBs set', stats.map(s => s.pbs), v => v, 'higher')}
+          ${(() => { const n = CLUBS.find(c => c > Math.max(...stats.map(s => s.totalRuns)));
+            return n ? cmpRow(`${n} shirt due`, stats.map(s => milestoneEta(s, n)?.getTime() ?? Infinity),
+              v => v === Infinity ? '—' : fmtMonth(new Date(v))) : ''; })()}
         </tbody>
       </table>
     </div>
@@ -374,6 +593,9 @@ function renderH2H() {
       </div>
     </div>` : ''}
   `;
+
+  if (sharedDays.length) setupReplay(runners, sharedDays, closest, biggest);
+  wireWrappedBanner();
 
   // Time chart — both runners overlaid
   chartInstances.push(new Chart(document.getElementById('h2hTime'), {
@@ -567,6 +789,7 @@ function render() {
   // DOM
   const app = document.getElementById('app');
   app.innerHTML = `
+    ${[11, 0].includes(new Date().getMonth()) ? wrappedBanner() : ''}
     ${heroHtml}
 
     <div class="kpis">
@@ -615,7 +838,9 @@ function render() {
       <div class="card" style="grid-column:1/-1;"><h2>Equivalent race times <span style="font-size:10px; color:var(--ink2); font-weight:normal;">(Riegel from 5k PB)</span></h2><div id="raceTimes"></div></div>
     </div>
 
-    <div class="card" style="margin-bottom:14px;"><h2>Activity heatmap (last 2 yrs)</h2><div id="heatmap" style="overflow-x:auto;"></div></div>
+    <div class="card" style="margin-bottom:14px;"><h2>Season rings</h2>
+      <div class="rings-wrap"><div id="heatmap"></div><div id="ringsNote" class="rings-note"></div></div>
+    </div>
 
     <div class="grid">
       <div class="card">
@@ -649,6 +874,8 @@ function render() {
       </div>
     </div>
   `;
+
+  wireWrappedBanner();
 
   // Streak ribbon
   document.getElementById('streakRibbon').innerHTML = `
@@ -875,44 +1102,93 @@ function render() {
           </div>
           <div style="font-size:10px; color:var(--ink2); text-transform:uppercase; letter-spacing:.5px; margin-top:8px; min-height:14px;">${m.n} club</div>
           <div style="font-weight:800; margin-top:2px; font-size:13px; min-height:18px;">${achieved ? '✅ earned' : rem + ' to go'}</div>
+          <div style="font-size:11px; color:var(--ink2); min-height:16px;">${achieved ? '' : (() => { const eta = milestoneEta(runner, m.n); return eta ? 'around ' + fmtMonth(eta) : ''; })()}</div>
           <div style="background:var(--bg); border-radius:999px; height:7px; overflow:hidden; margin-top:6px; width:100%;">
             <div style="background:${achieved?m.color:'#ffa300'}; height:100%; width:${pct}%;"></div>
           </div>
         </div>`;
       }).join('')}
-    </div>`;
+    </div>
+    <div style="font-size:11px; color:var(--ink2); margin-top:10px;">Dates assume you keep turning up like the last 12 months (${attendance(runner).runs} runs).</div>`;
 
-  // Heatmap
-  const end = data[data.length-1].d;
-  const start = new Date(end); start.setFullYear(end.getFullYear() - 2);
-  const runDays = new Map(data.map(r => [r.d.toDateString(), r]));
-  const weeks = [];
-  let cursor = new Date(start);
-  while (cursor.getDay() !== 6) cursor.setDate(cursor.getDate()+1);
-  while (cursor <= end) { weeks.push(new Date(cursor)); cursor.setDate(cursor.getDate()+7); }
-  const cellSize = 13, gap = 3;
-  const w = weeks.length * (cellSize+gap) + 40;
-  let svg = `<svg width="${w}" height="${cellSize*2 + 36}" style="font:10px sans-serif;">`;
-  let prevMonth = -1;
-  weeks.forEach((wk, i) => {
-    const m = wk.getMonth();
-    if (m !== prevMonth && wk.getDate() <= 14) {
-      svg += `<text x="${40+i*(cellSize+gap)}" y="10" style="fill:var(--ink2)">${wk.toLocaleString('en',{month:'short'})}</text>`;
-      prevMonth = m;
+  // Season rings: one ring per year (oldest innermost), one dot per Saturday,
+  // clockwise from January at the top. A year loops, so this shows what a
+  // strip can't: the summer gaps, when PBs cluster, the rings brightening as
+  // fitness came. A small wedge at 12 o'clock is left empty for year labels.
+  {
+    const first = data[0], last = data[data.length - 1];
+    const years = [];
+    for (let y = first.d.getFullYear(); y <= last.d.getFullYear(); y++) years.push(y);
+    const S = 440, C = S / 2, R_IN = 60, R_OUT = 192, GAP = 0.045;
+    const ringW = (R_OUT - R_IN) / years.length;
+    // colour by this runner's own age-grade thirds, so everyone gets the full range
+    const ags = data.map(r => r.ageGrade).sort((a, b) => a - b);
+    const t1 = ags[Math.floor(ags.length / 3)], t2 = ags[Math.floor(2 * ags.length / 3)];
+    const tier = r => r.pb ? 'var(--pb)' : r.ageGrade >= t2 ? 'var(--hm3)' : r.ageGrade >= t1 ? 'var(--hm2)' : 'var(--hm1)';
+    const angle = d => {
+      const y0 = new Date(d.getFullYear(), 0, 1), y1 = new Date(d.getFullYear() + 1, 0, 1);
+      return -Math.PI / 2 + Math.PI * GAP + ((d - y0) / (y1 - y0)) * 2 * Math.PI * (1 - GAP);
+    };
+    const pt = (a, r) => [(C + r * Math.cos(a)).toFixed(1), (C + r * Math.sin(a)).toFixed(1)];
+    const byDay = new Map(data.map(r => [r.d.toDateString(), r]));
+    const saturdays = [];   // every Saturday from the first run to the latest
+    for (const d = new Date(first.d); d <= last.d; d.setDate(d.getDate() + 1)) if (d.getDay() === 6) saturdays.push(new Date(d));
+
+    let svg = `<svg viewBox="0 0 ${S} ${S}" class="rings" role="img" aria-label="${data.length} parkruns by week, one ring per year">`;
+    for (let m = 0; m < 12; m++) {
+      const [x1, y1] = pt(angle(new Date(2025, m, 1)), R_IN - 6), [x2, y2] = pt(angle(new Date(2025, m, 1)), R_OUT + 6);
+      svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" style="stroke:var(--grid)" stroke-width="1"/>`;
+      const [lx, ly] = pt(angle(new Date(2025, m, 16)), R_OUT + 17);
+      svg += `<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="central" class="ring-month">${'JFMAMJJASOND'[m]}</text>`;
     }
-  });
-  weeks.forEach((wk, i) => {
-    const run = runDays.get(wk.toDateString());
-    const color = run ? (run.pb ? 'var(--pb)' : (run.ageGrade > 45 ? 'var(--hm3)' : run.ageGrade > 40 ? 'var(--hm2)' : 'var(--hm1)')) : 'var(--hm0)';
-    const title = run ? `${run.date}: ${run.time} (${run.ageGrade}%)` : wk.toLocaleDateString('en-GB')+': no run';
-    svg += `<rect x="${40+i*(cellSize+gap)}" y="15" width="${cellSize}" height="${cellSize}" style="fill:${color}" rx="2"><title>${title}</title></rect>`;
-  });
-  svg += `<text x="40" y="${15+cellSize+16}" style="fill:var(--ink2)">less</text>`;
-  ['var(--hm0)','var(--hm1)','var(--hm2)','var(--hm3)','var(--pb)'].forEach((c,i) => {
-    svg += `<rect x="${75+i*18}" y="${15+cellSize+8}" width="12" height="12" style="fill:${c}" rx="2"/>`;
-  });
-  svg += `<text x="${75+5*18+4}" y="${15+cellSize+16}" style="fill:var(--ink2)">more / PB</text></svg>`;
-  document.getElementById('heatmap').innerHTML = svg;
+    years.forEach((y, k) => {
+      const r = R_IN + ringW * (k + 0.5);
+      const dotR = Math.max(1.8, Math.min(ringW * 0.36, (2 * Math.PI * r / 52.2) * 0.4, 6.5));
+      // each year sits in its own lane, like a running track
+      svg += `<circle cx="${C}" cy="${C}" r="${r.toFixed(1)}" fill="none" style="stroke:var(--grid)" stroke-width="${(ringW * 0.78).toFixed(1)}" opacity=".55"/>`;
+      const days = saturdays.filter(d => d.getFullYear() === y)
+        .concat(data.filter(x => x.d.getFullYear() === y && x.d.getDay() !== 6).map(x => x.d));   // Christmas / New Year's Day
+      for (const day of days) {
+        const run = byDay.get(day.toDateString());
+        const [x, yy] = pt(angle(day), r);
+        const title = run ? `${run.date}: ${run.time} · ${run.ageGrade}%${run.pb ? ' · PB' : ''}` : `${day.toLocaleDateString('en-GB')}: no run`;
+        svg += `<circle cx="${x}" cy="${yy}" r="${(run ? dotR : dotR * 0.5).toFixed(2)}" style="fill:${run ? tier(run) : 'var(--hm0)'}"><title>${title}</title></circle>`;
+      }
+      const [tx, ty] = pt(-Math.PI / 2, r);
+      svg += `<text x="${tx}" y="${ty}" text-anchor="middle" dominant-baseline="central" class="ring-year">’${String(y).slice(2)}</text>`;
+    });
+    const [hx, hy] = pt(angle(last.d), R_IN + ringW * (years.length - 0.5));
+    svg += `<circle cx="${hx}" cy="${hy}" r="${Math.min(ringW * 0.36, 6.5) + 3.5}" fill="none" style="stroke:var(--ink)" stroke-width="1.5"><title>Latest: ${last.date}</title></circle>`;
+    svg += `<text x="${C}" y="${C - 7}" text-anchor="middle" dominant-baseline="central" class="ring-total">${data.length}</text>`;
+    svg += `<text x="${C}" y="${C + 19}" text-anchor="middle" dominant-baseline="central" class="ring-sub">parkruns</text></svg>`;
+    document.getElementById('heatmap').innerHTML = svg;
+
+    // Facts the rings make visible. Event numbers only advance when an event is
+    // held, so last − first + 1 is exactly how many happened in your span.
+    const held = last.run - first.run + 1;
+    const sat = Array(12).fill(0), ran = Array(12).fill(0), pbm = Array(12).fill(0);
+    saturdays.forEach(d => sat[d.getMonth()]++);
+    data.forEach(r => { if (r.d.getDay() === 6) ran[r.d.getMonth()]++; if (r.pb) pbm[r.d.getMonth()]++; });
+    const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const missShare = sat.map((n, m) => n >= 4 ? (n - ran[m]) / n : -1);
+    const worst = missShare.indexOf(Math.max(...missShare));
+    const pbTop = Math.max(...pbm), pbMonths = pbm.map((n, m) => n === pbTop ? MONTHS[m] : null).filter(Boolean);
+    const totalPbs = pbm.reduce((a, b) => a + b, 0);
+    document.getElementById('ringsNote').innerHTML = `
+      <div class="fact"><div class="big">${Math.round(100 * data.length / held)}%</div>
+        <div class="what">of Widnes parkruns since your first: ${data.length} of the ${held} held</div></div>
+      ${missShare[worst] > 0 ? `<div class="fact"><div class="big">${MONTHS[worst]}</div>
+        <div class="what">is when you miss most: ${sat[worst] - ran[worst]} of ${sat[worst]} Saturdays</div></div>` : ''}
+      ${totalPbs ? `<div class="fact"><div class="big">${pbMonths.slice(0, 2).join(' & ')}</div>
+        <div class="what">${pbMonths.length > 1 ? 'are' : 'is'} PB season: ${pbTop} of your ${totalPbs} PBs ${pbMonths.length > 1 ? 'each' : ''}</div></div>` : ''}
+      <div class="rings-legend">
+        <span><i style="background:var(--hm0)"></i>missed</span>
+        <span><i style="background:var(--hm1)"></i>your slower third</span>
+        <span><i style="background:var(--hm2)"></i>middle</span>
+        <span><i style="background:var(--hm3)"></i>quicker third</span>
+        <span><i style="background:var(--pb)"></i>PB</span>
+      </div>`;
+  }
 
   // Weather. A raw correlation between weather and finish time mostly
   // measures fitness: the slow beginner months happened to be windier, so wind
@@ -1055,6 +1331,171 @@ function render() {
     th.onclick = () => { const k = th.dataset.sort; if (k===sortKey) sortDir*=-1; else { sortKey=k; sortDir=-1; } renderTable(); };
   });
 }
+
+// Year wrapped: a family story for one year, card by card. Shows "so far"
+// until December; in January it defaults to the year just finished.
+const W = { year: null, i: 0, slides: [] };
+const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+function wrappedYears() {
+  const ys = new Set(PAYLOAD.runners.flatMap(r => r.results.map(x => parseDate(x.date).getFullYear())));
+  return [...ys].sort((a, b) => a - b);
+}
+function defaultWrappedYear() {
+  const ys = wrappedYears(), now = new Date();
+  const y = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
+  return ys.includes(y) ? y : ys[ys.length - 1];
+}
+function wrappedBanner() {
+  const y = defaultWrappedYear(), done = y < new Date().getFullYear() || new Date().getMonth() === 11;
+  return `<button class="wrapped-banner" type="button" data-wrapped><b>✨ ${y} wrapped</b><span>${done ? 'Your year' : 'Your year so far'} in cards ›</span></button>`;
+}
+function wireWrappedBanner() {
+  document.querySelectorAll('[data-wrapped]').forEach(b => b.onclick = () => openWrapped(defaultWrappedYear(), b));
+}
+
+function yearStats(Y) {
+  const people = PAYLOAD.runners.map((r, i) => {
+    const all = prep(r), yr = all.filter(x => x.d.getFullYear() === Y);
+    const before = all.filter(x => x.d.getFullYear() < Y);
+    const after = all.filter(x => x.d.getFullYear() > Y).length;
+    const fastest = yr.length ? yr.reduce((a, b) => b.seconds < a.seconds ? b : a) : null;
+    const bestBefore = before.length ? Math.min(...before.map(x => x.seconds)) : null;
+    let streak = yr.length ? 1 : 0, cur = 1;
+    for (let k = 1; k < yr.length; k++) { cur = yr[k].run - yr[k-1].run === 1 ? cur + 1 : 1; streak = Math.max(streak, cur); }
+    const endTotal = r.totalRuns - after, startTotal = endTotal - yr.length;
+    return { i, short: r.short, runner: r, yr, fastest, bestBefore, pbs: yr.filter(x => x.pb), streak,
+             crossed: CLUBS.filter(c => startTotal < c && endTotal >= c), endTotal };
+  });
+  const byDate = {};
+  people.forEach(p => p.yr.forEach(x => { (byDate[x.date] = byDate[x.date] || { d: x.d, runs: {} }).runs[p.i] = x; }));
+  const days = Object.entries(byDate).map(([date, v]) => ({ date, ...v })).sort((a, b) => a.d - b.d);
+  const shared = days.filter(d => people.every(p => d.runs[p.i]));
+  const wins = people.map(() => 0); let closest = null;
+  shared.forEach(d => {
+    const [a, b] = [d.runs[0], d.runs[1]], gap = Math.abs(a.seconds - b.seconds);
+    if (a.seconds < b.seconds) wins[0]++; else if (b.seconds < a.seconds) wins[1]++;
+    if (gap > 0 && (!closest || gap < closest.gap)) closest = { ...d, gap };
+  });
+  const months = Array(12).fill(0);
+  days.forEach(d => months[d.d.getMonth()] += Object.keys(d.runs).length);
+  const wx = days.map(d => ({ ...d, w: Object.values(d.runs)[0].weather })).filter(d => d.w);
+  return { Y, people, days, shared, wins, ties: shared.length - wins[0] - wins[1], closest, months, wx,
+           runs: people.reduce((t, p) => t + p.yr.length, 0) };
+}
+
+function buildSlides(st) {
+  const P = st.people, names = P.map(p => p.short).join(' & ');
+  const who = p => `<span class="w-name" style="color:var(--r${p.i}-on-dark)">${p.short}</span>`;
+  const soFar = st.Y === new Date().getFullYear() && new Date().getMonth() < 11;
+  const out = [];
+  out.push(`<div class="w-eyebrow">${names}</div>
+    <div class="w-big">${st.Y}</div><div class="w-mid" style="opacity:.85">wrapped${soFar ? ' so far' : ''}</div>
+    <div class="w-text">${st.runs} parkruns between you${st.shared.length ? `, ${st.shared.length} of them side by side` : ''}.</div>
+    <div class="w-years">${wrappedYears().map(y => `<button type="button" data-year="${y}" class="${y === st.Y ? 'on' : ''}">${y}</button>`).join('')}</div>`);
+  if (!st.runs) return out;
+
+  const top = [...P].sort((a, b) => b.yr.length - a.yr.length);
+  out.push(`<div class="w-eyebrow">Turning up</div>
+    <div class="w-big">${st.runs * 5}<span style="font-size:.4em"> km</span></div>
+    <div class="w-text">${st.runs} parkruns between you, across ${st.days.length} Saturday mornings in Widnes.${top[0].yr.length !== top[1].yr.length ? ` ${top[0].short} made it to ${top[0].yr.length - top[1].yr.length} more.` : ' Exactly level.'}</div>
+    <div class="w-row">${P.map(p => `<div class="w-tile">${who(p)}<div class="w-mid">${p.yr.length}</div><div class="w-sub">parkruns</div></div>`).join('')}</div>`);
+
+  out.push(`<div class="w-eyebrow">Fastest of the year</div>
+    <div class="w-row">${P.map(p => `<div class="w-tile">${who(p)}<div class="w-mid">${p.fastest ? p.fastest.time : '—'}</div>
+      <div class="w-sub">${p.fastest ? p.fastest.date + (p.bestBefore == null ? '' : p.fastest.seconds < p.bestBefore
+        ? ` · ${fmtGap(p.bestBefore - p.fastest.seconds)} quicker than ever before` : ` · best ever still ${fmtTime(p.bestBefore)}`) : 'no runs'}</div></div>`).join('')}</div>`);
+
+  const pbCount = P.reduce((t, p) => t + p.pbs.length, 0);
+  // a list for a handful; a big year (2023 had 16) gets one tile each instead
+  out.push(pbCount > 6
+    ? `<div class="w-eyebrow">New PBs</div><div class="w-big">${pbCount}</div>
+       <div class="w-row">${P.map(p => `<div class="w-tile">${who(p)}<div class="w-mid">${p.pbs.length}</div>
+         <div class="w-sub">${p.pbs.length ? `down to ${p.pbs[p.pbs.length - 1].time} by ${p.pbs[p.pbs.length - 1].date}` : 'none this year'}</div></div>`).join('')}</div>`
+    : pbCount
+    ? `<div class="w-eyebrow">New PBs</div><div class="w-big">${pbCount}</div>
+       <div class="w-list">${P.flatMap(p => p.pbs.map(x => `<div>${who(p)}<span>${x.date}</span><b class="display" style="font-size:18px">${x.time}</b></div>`)).join('')}</div>`
+    : `<div class="w-eyebrow">New PBs</div><div class="w-mid">None this year</div>
+       <div class="w-text">The bests still standing: ${P.map(p => `${p.short} ${p.bestBefore != null ? fmtTime(p.bestBefore) : '—'}`).join(', ')}. Next year.</div>`);
+
+  if (st.shared.length) {
+    const lead = st.wins[0] === st.wins[1] ? null : st.wins[0] > st.wins[1] ? P[0] : P[1];
+    out.push(`<div class="w-eyebrow">Head to head</div>
+      <div class="w-big"><span style="color:var(--r0-on-dark)">${st.wins[0]}</span><span style="opacity:.4">–</span><span style="color:var(--r1-on-dark)">${st.wins[1]}</span></div>
+      <div class="w-text">${lead ? `${lead.short} took the year` : 'Honours even'}${st.ties ? `, with ${st.ties} dead heat${st.ties === 1 ? '' : 's'}` : ''}.
+        ${st.closest ? `Closest: ${fmtGap(st.closest.gap)} on ${st.closest.date}.` : ''}</div>`);
+  }
+
+  out.push(`<div class="w-eyebrow">Longest streak</div>
+    <div class="w-row">${P.map(p => `<div class="w-tile">${who(p)}<div class="w-mid">${p.streak}</div><div class="w-sub">parkruns in a row</div></div>`).join('')}</div>
+    <div class="w-text">Counted in event numbers, so a cancelled week doesn't break it.</div>`);
+
+  const peak = Math.max(...st.months), pm = st.months.indexOf(peak);
+  out.push(`<div class="w-eyebrow">Busiest month</div><div class="w-mid">${MONTH_NAMES[pm]}</div>
+    <div class="w-text">${peak} runs between you.</div>
+    <div class="w-months">${st.months.map((n, m) => `<div class="${m === pm ? 'peak' : ''}${soFar && m > new Date().getMonth() ? ' future' : ''}"><b style="height:${peak ? (n / peak) * 100 : 0}%"></b>${'JFMAMJJASOND'[m]}</div>`).join('')}</div>`);
+
+  if (st.wx.length) {
+    const wet = [...st.wx].sort((a, b) => b.w.rain - a.w.rain)[0];
+    const cold = [...st.wx].sort((a, b) => a.w.temp - b.w.temp)[0];
+    const windy = [...st.wx].sort((a, b) => b.w.wind - a.w.wind)[0];
+    const ran = d => P.filter(p => d.runs[p.i]).map(p => p.short).join(' & ');
+    out.push(`<div class="w-eyebrow">Weathering it</div>
+      <div class="w-list">
+        ${wet.w.rain > 0 ? `<div><span>🌧 Wettest</span><span>${wet.date} · ${ran(wet)}</span><b>${wet.w.rain}mm</b></div>` : ''}
+        <div><span>🥶 Coldest start</span><span>${cold.date} · ${ran(cold)}</span><b>${cold.w.temp}°C</b></div>
+        <div><span>💨 Windiest</span><span>${windy.date} · ${ran(windy)}</span><b>${Math.round(windy.w.wind)} km/h</b></div>
+      </div>
+      <div class="w-text">All measured 9–10am, while you were out there.</div>`);
+  }
+
+  const crossed = P.filter(p => p.crossed.length);
+  out.push(`<div class="w-eyebrow">Milestones</div>
+    ${crossed.length ? `<div class="w-mid">${crossed.map(p => `${p.short}: ${p.crossed.join(' & ')}`).join('<br>')}</div><div class="w-text">New shirt${crossed.length > 1 ? 's' : ''} earned this year.</div>`
+                     : `<div class="w-mid">Building up</div><div class="w-text">No new shirts this year, but every run counts towards the next.</div>`}
+    <div class="w-row">${P.map(p => { const n = CLUBS.find(c => c > p.endTotal), eta = n && soFar ? milestoneEta(p.runner, n) : null;
+      return `<div class="w-tile">${who(p)}<div class="w-mid">${p.endTotal}</div><div class="w-sub">${n ? `${n - p.endTotal} to the ${n} shirt${eta ? `, around ${fmtMonth(eta)}` : ''}` : 'all shirts earned'}</div></div>`; }).join('')}</div>
+    <div class="w-text" style="margin-top:22px">See you Saturday 👋</div>`);
+  return out;
+}
+
+function showSlide(i) {
+  W.i = Math.max(0, Math.min(W.slides.length - 1, i));
+  const card = document.getElementById('wCard');
+  card.innerHTML = W.slides[W.i];
+  card.classList.remove('w-enter'); void card.offsetWidth; card.classList.add('w-enter');
+  document.getElementById('wBars').innerHTML = W.slides.map((_, k) => `<i class="${k <= W.i ? 'on' : ''}"></i>`).join('');
+  document.getElementById('wCount').textContent = `${W.i + 1} / ${W.slides.length}`;
+  document.getElementById('wPrev').disabled = W.i === 0;
+  document.getElementById('wNext').textContent = W.i === W.slides.length - 1 ? 'Done' : 'Next ›';
+  card.querySelectorAll('[data-year]').forEach(b => b.onclick = e => { e.stopPropagation(); openWrapped(+b.dataset.year); });
+}
+function openWrapped(Y, opener) {
+  W.year = Y; W.slides = buildSlides(yearStats(Y));
+  const el = document.getElementById('wrapped');
+  if (el.hidden) { W.opener = opener || document.activeElement; el.hidden = false; document.body.classList.add('w-open'); }
+  showSlide(0);
+  document.getElementById('wClose').focus();
+}
+function closeWrapped() {
+  document.getElementById('wrapped').hidden = true;
+  document.body.classList.remove('w-open');
+  if (W.opener && W.opener.focus) W.opener.focus();
+}
+document.getElementById('wClose').onclick = closeWrapped;
+document.getElementById('wPrev').onclick = () => showSlide(W.i - 1);
+document.getElementById('wNext').onclick = () => W.i === W.slides.length - 1 ? closeWrapped() : showSlide(W.i + 1);
+// tap the left third to go back, anywhere else to go on
+document.getElementById('wStage').onclick = e => {
+  const r = e.currentTarget.getBoundingClientRect();
+  if (e.clientX - r.left < r.width / 3) showSlide(W.i - 1);
+  else if (W.i < W.slides.length - 1) showSlide(W.i + 1);
+};
+document.addEventListener('keydown', e => {
+  if (document.getElementById('wrapped').hidden) return;
+  if (e.key === 'Escape') closeWrapped();
+  else if (e.key === 'ArrowRight') showSlide(W.i + 1);
+  else if (e.key === 'ArrowLeft') showSlide(W.i - 1);
+});
 
 // Theme toggle: Auto → Light → Dark → Auto. Canvas colours are baked in at
 // draw time, so any change has to redraw the active view.
