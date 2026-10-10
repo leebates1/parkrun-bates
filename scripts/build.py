@@ -345,21 +345,40 @@ def to_iso(d):
 
 
 def fetch_weather(lat, lon, start, end):
+    """Conditions during the run itself, 09:00-10:00 local.
+
+    Whole-day aggregates were misleading: an afternoon downpour or a 3pm gust
+    counted against a run that finished at 9:40. Open-Meteo's hourly
+    precipitation is the total over the preceding hour, so the 10:00 value is
+    the rain that fell while you were running.
+    """
     url = (
         "https://archive-api.open-meteo.com/v1/archive"
         f"?latitude={lat}&longitude={lon}"
         f"&start_date={start}&end_date={end}"
-        "&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max"
+        "&hourly=temperature_2m,precipitation,wind_speed_10m,wind_gusts_10m"
         "&timezone=Europe%2FLondon"
     )
-    data = json.loads(fetch(url))["daily"]
+    h = json.loads(fetch(url))["hourly"]
+    idx = {t: i for i, t in enumerate(h["time"])}
     out = {}
-    for i, d in enumerate(data["time"]):
-        out[d] = {
-            "tmax": data["temperature_2m_max"][i],
-            "tmin": data["temperature_2m_min"][i],
-            "rain": data["precipitation_sum"][i],
-            "wind": data["wind_speed_10m_max"][i],
+    for t, i9 in idx.items():
+        if not t.endswith("T09:00"):
+            continue
+        i10 = idx.get(t[:10] + "T10:00")
+        if i10 is None:
+            continue
+        temp = h["temperature_2m"][i9]
+        rain = h["precipitation"][i10]
+        winds = (h["wind_speed_10m"][i9], h["wind_speed_10m"][i10])
+        gusts = (h["wind_gusts_10m"][i9], h["wind_gusts_10m"][i10])
+        if None in (temp, rain, *winds, *gusts):
+            continue  # the archive lags a few days; leave recent runs without
+        out[t[:10]] = {
+            "temp": round(temp, 1),
+            "rain": round(rain, 1),
+            "wind": round(sum(winds) / 2, 1),
+            "gust": round(max(gusts), 1),
         }
     return out
 

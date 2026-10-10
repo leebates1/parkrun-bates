@@ -178,13 +178,6 @@ function toSeconds(t) { const p = t.split(':').map(Number); return p.length===3 
 function fmtTime(s) { const m = Math.floor(s/60), sec = Math.round(s%60); return m + ':' + String(sec).padStart(2,'0'); }
 function fmtGap(s) { return s < 60 ? Math.round(s) + 's' : fmtTime(s); }
 function fmtLong(s) { const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = Math.round(s%60); return (h ? h+':' + String(m).padStart(2,'0') : m) + ':' + String(sec).padStart(2,'0'); }
-function pearson(xs, ys) {
-  const n = xs.length; if (n < 2) return 0;
-  const mx = xs.reduce((a,b)=>a+b,0)/n, my = ys.reduce((a,b)=>a+b,0)/n;
-  let num=0,dx2=0,dy2=0;
-  for (let i=0;i<n;i++){ const dx=xs[i]-mx, dy=ys[i]-my; num+=dx*dy; dx2+=dx*dx; dy2+=dy*dy; }
-  return dx2 && dy2 ? num/Math.sqrt(dx2*dy2) : 0;
-}
 
 // switcher buttons
 const swEl = document.getElementById('switcher');
@@ -513,7 +506,7 @@ function render() {
     return `<span class="chip ${v < 0 ? 'faster' : 'slower'}">${signed} vs ${what}</span>`;
   }
   const wx = latest.weather;
-  const wxIcon = !wx ? '' : wx.rain >= 4 ? '🌧' : wx.rain >= 0.2 ? '🌦' : wx.tmax >= 20 ? '☀️' : wx.tmax <= 4 ? '🥶' : '⛅';
+  const wxIcon = !wx ? '' : wx.rain >= 1 ? '🌧' : wx.rain >= 0.1 ? '🌦' : wx.temp >= 20 ? '☀️' : wx.temp <= 4 ? '🥶' : '⛅';
   const heroHtml = `
     <div class="hero">
       <div class="hero-top">
@@ -531,7 +524,7 @@ function render() {
         ${prevRun ? chip(latest.seconds - prevRun.seconds, 'last run') : ''}
         ${chip(yearAvg == null ? null : latest.seconds - yearAvg, '12-mo avg')}
         ${isPB ? '' : `<span class="chip">${fmtTime(latest.seconds - pb.seconds)} off PB (${pb.time})</span>`}
-        ${wx ? `<span class="chip">${wxIcon} ${wx.tmax}°C · ${wx.rain}mm rain · ${Math.round(wx.wind)} km/h</span>` : ''}
+        ${wx ? `<span class="chip" title="Conditions 9–10am, during the run">${wxIcon} ${wx.temp}°C · ${wx.rain > 0 ? wx.rain + 'mm rain' : 'dry'} · ${Math.round(wx.wind)} km/h wind</span>` : ''}
       </div>
       ${rival ? `<div class="hero-vs">${
         latest.seconds === rival.seconds
@@ -626,9 +619,15 @@ function render() {
 
     <div class="grid">
       <div class="card">
-        <h2>Weather vs finish time</h2>
+        <h2>Does the weather slow you down?</h2>
+        <div id="weatherVerdict" style="font-size:13px; line-height:1.55; margin-bottom:10px;"></div>
+        <div class="controls">
+          <button class="btn active" data-wx="wind">Wind</button>
+          <button class="btn" data-wx="temp">Temperature</button>
+          <button class="btn" data-wx="rain">Rain</button>
+        </div>
         <div class="chart-wrap"><canvas id="weatherChart"></canvas></div>
-        <div id="weatherInsight" style="font-size:11px; color:var(--ink2); margin-top:6px;"></div>
+        <div id="weatherInsight" style="font-size:11px; color:var(--ink2); margin-top:6px; line-height:1.5;"></div>
       </div>
       <div class="card"><h2>Weather extremes</h2><div id="weatherExtremes"></div></div>
     </div>
@@ -915,26 +914,109 @@ function render() {
   svg += `<text x="${75+5*18+4}" y="${15+cellSize+16}" style="fill:var(--ink2)">more / PB</text></svg>`;
   document.getElementById('heatmap').innerHTML = svg;
 
-  // Weather
+  // Weather. A raw correlation between weather and finish time mostly
+  // measures fitness: the slow beginner months happened to be windier, so wind
+  // "correlated" with time. Instead, compare each run with the runner's form
+  // at the time (median of the 8 runs around it) and ask whether weather
+  // explains what's left, with a bootstrap range so noise isn't sold as signal.
   const wData = data.filter(r => r.weather);
-  if (wData.length) {
-    chartInstances.push(new Chart(document.getElementById('weatherChart'), {
-      type: 'scatter',
-      data: { datasets: [{ label: 'Run', data: wData.map(r => ({x:r.weather.tmax, y:r.seconds, date:r.date, time:r.time, rain:r.weather.rain, wind:r.weather.wind, pb:r.pb})),
-        backgroundColor: ctx => ctx.raw && ctx.raw.pb ? '#ff4d6d' : '#00b6c4',
-        pointRadius: ctx => ctx.raw && ctx.raw.pb ? 7 : 5, pointHoverRadius: 8 }] },
-      options: { maintainAspectRatio: false, plugins: { legend: { display: false },
-        tooltip: { callbacks: { label: c => { const r=c.raw; return [r.date+'  '+r.time+(r.pb?' (PB)':''), 'Temp: '+r.x+'°C', 'Rain: '+r.rain+'mm', 'Wind: '+r.wind+' km/h']; } } } },
-        scales: { x: { title: { display: true, text: 'Max temp (°C)' }, grid: { color: () => getComputedStyle(document.documentElement).getPropertyValue('--grid').trim() || '#eee' } },
-                  y: { reverse: true, ticks: { callback: v => fmtTime(v) }, grid: { color: () => getComputedStyle(document.documentElement).getPropertyValue('--grid').trim() || '#eee' } } }
-      }
-    }));
-    const rT = pearson(wData.map(r=>r.weather.tmax), wData.map(r=>r.seconds));
-    const rR = pearson(wData.map(r=>r.weather.rain), wData.map(r=>r.seconds));
-    const rW = pearson(wData.map(r=>r.weather.wind), wData.map(r=>r.seconds));
-    document.getElementById('weatherInsight').innerHTML = `Correlation &mdash; temp: <b>${rT.toFixed(2)}</b>, rain: <b>${rR.toFixed(2)}</b>, wind: <b>${rW.toFixed(2)}</b>.`;
+  if (wData.length >= 20) {
+    const median = a => { const s = [...a].sort((x, y) => x - y), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m-1] + s[m]) / 2; };
+    const mean = a => a.reduce((t, v) => t + v, 0) / a.length;
+    const FORM_K = 4;
+    const vsForm = data.map((r, i) => {
+      const nb = data.slice(Math.max(0, i - FORM_K), i).concat(data.slice(i + 1, i + 1 + FORM_K)).map(x => x.seconds);
+      return r.seconds - median(nb);
+    });
+    const centre = median(vsForm);
+    const spread = 1.4826 * median(vsForm.map(e => Math.abs(e - centre)));   // robust SD
+    const usable = data.map((r, i) => ({ r, e: vsForm[i] }))
+      .filter(u => u.r.weather && Math.abs(u.e - centre) <= 4 * spread);   // drop one-off runs, e.g. walking with someone
+    const dropped = wData.length - usable.length;
 
-    const byTemp = [...wData].sort((a,b) => a.weather.tmax - b.weather.tmax);
+    // Seeded, so the verdict doesn't change between page loads.
+    const rng = seed => () => { seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+    const slope = (xs, ys) => { const mx = mean(xs), my = mean(ys); let n = 0, d = 0;
+      for (let i = 0; i < xs.length; i++) { n += (xs[i] - mx) * (ys[i] - my); d += (xs[i] - mx) ** 2; } return d ? n / d : 0; };
+    const FX = {
+      wind: { label: 'Wind', x: w => w.wind, per: 10, axis: 'Wind during the run (km/h)',
+              unit: 'per extra 10 km/h', phrase: 'every extra 10 km/h of wind' },
+      temp: { label: 'Temperature', x: w => w.temp, per: 5, axis: 'Temperature at the start (°C)',
+              unit: 'per 5°C warmer', phrase: 'every 5°C warmer' },
+      // mostly dry runs, so compare wet with dry rather than fit a slope per mm
+      rain: { label: 'Rain', x: w => w.rain >= 0.2 ? 1 : 0, plotX: w => w.rain, per: 1, axis: 'Rain during the run (mm)',
+              unit: 'wet vs dry', phrase: 'running in the rain' },
+    };
+    for (const [key, f] of Object.entries(FX)) {
+      const xs = usable.map(u => f.x(u.r.weather)), ys = usable.map(u => u.e);
+      f.n = key === 'rain' ? xs.filter(Boolean).length : xs.length;
+      f.est = slope(xs, ys) * f.per;
+      const rand = rng(529), boots = [];
+      for (let b = 0; b < 1000; b++) {
+        const bx = [], by = [];
+        for (let i = 0; i < xs.length; i++) { const j = Math.floor(rand() * xs.length); bx.push(xs[j]); by.push(ys[j]); }
+        boots.push(slope(bx, by) * f.per);
+      }
+      boots.sort((a, b) => a - b);
+      [f.lo, f.hi] = [boots[5], boots[994]];   // 99%: three things are tested, so be strict
+      f.enough = f.n >= 8;
+      f.clear = f.enough && (f.lo > 0 || f.hi < 0);
+    }
+
+    const sgn = v => (v < 0 ? '−' : '+') + fmtGap(Math.abs(Math.round(v)));
+    const clear = Object.values(FX).filter(f => f.clear);
+    const verdict = !clear.length
+      ? `<b>Not measurably.</b> Allowing for your form at the time, wind, temperature and rain make no difference we can detect.
+         Your times naturally swing by about <b>${fmtGap(Math.round(spread))}</b> either side of your form from week to week,
+         so the weather would need a big effect to show up, and nothing does.`
+      : `<b>${clear.map(f => f.label).join(' and ')} ${clear.length > 1 ? 'do' : 'does'}.</b> Allowing for your form at the time, ` +
+        clear.map(f => `${f.phrase} ${f.est > 0 ? 'costs' : 'saves'} you about <b>${fmtGap(Math.abs(Math.round(f.est)))}</b>
+          (somewhere between ${fmtGap(Math.abs(Math.round(f.est > 0 ? f.lo : f.hi)))} and ${fmtGap(Math.abs(Math.round(f.est > 0 ? f.hi : f.lo)))})`).join('; ') +
+        `. ${Object.values(FX).filter(f => !f.clear).map(f => f.label.toLowerCase()).join(' and ') || 'nothing else'} make no difference we can detect.`;
+    document.getElementById('weatherVerdict').innerHTML = verdict;
+
+    let wxChart;
+    function drawWx(key) {
+      const f = FX[key], px = f.plotX || f.x;
+      const pts = usable.map(u => ({ x: px(u.r.weather), y: u.e, date: u.r.date, time: u.r.time, pb: u.r.pb, w: u.r.weather }));
+      const xs = pts.map(p => p.x), x0 = Math.min(...xs), x1 = Math.max(...xs);
+      if (wxChart) { wxChart.destroy(); chartInstances = chartInstances.filter(c => c !== wxChart); }
+      wxChart = new Chart(document.getElementById('weatherChart'), {
+        type: 'scatter',
+        data: { datasets: [
+          { label: 'Run', data: pts, backgroundColor: ctx => ctx.raw && ctx.raw.pb ? '#ff4d6d' : '#00b6c4',
+            pointRadius: ctx => ctx.raw && ctx.raw.pb ? 6 : 4, pointHoverRadius: 7 },
+          { label: 'Your form', type: 'line', data: [{ x: x0, y: 0 }, { x: x1, y: 0 }], borderColor: cssVar('--ink2'),
+            borderDash: [5, 4], borderWidth: 1, pointRadius: 0 },
+        ] },
+        options: { maintainAspectRatio: false,
+          plugins: { legend: { display: false },
+            tooltip: { filter: c => c.datasetIndex === 0, callbacks: { label: c => { const r = c.raw;
+              return [r.date + '  ' + r.time + (r.pb ? ' (PB)' : ''), sgn(r.y) + ' vs your form',
+                      r.w.temp + '°C · ' + (r.w.rain > 0 ? r.w.rain + 'mm rain' : 'dry') + ' · ' + Math.round(r.w.wind) + ' km/h wind']; } } } },
+          scales: {
+            x: { title: { display: true, text: f.axis }, grid: { color: () => gridColor() } },
+            y: { reverse: true, title: { display: true, text: 'vs your form · faster ↑' },
+                 ticks: { callback: v => v === 0 ? '0' : sgn(v) }, grid: { color: () => gridColor() } }
+          }
+        }
+      });
+      chartInstances.push(wxChart);
+      document.getElementById('weatherInsight').innerHTML =
+        (f.enough
+          ? `<b>${f.label}:</b> ${f.clear ? 'a clear effect' : 'no clear effect'}, somewhere between ${sgn(f.lo)} and ${sgn(f.hi)} ${f.unit}.`
+          : `<b>${f.label}:</b> only ${f.n} runs to go on, too few to tell.`) +
+        ` Each dot is a run against the median of the 8 runs around it, so getting fitter doesn't look like weather.
+          Weather is for 9–10am, while you were running.${dropped ? ` ${dropped} one-off run${dropped === 1 ? '' : 's'} far from your usual form left out.` : ''}`;
+    }
+    drawWx('wind');
+    document.querySelectorAll('.btn[data-wx]').forEach(b => b.onclick = () => {
+      document.querySelectorAll('.btn[data-wx]').forEach(x => x.classList.toggle('active', x === b));
+      drawWx(b.dataset.wx);
+    });
+
+    const byTemp = [...wData].sort((a,b) => a.weather.temp - b.weather.temp);
     const rainy = [...wData].sort((a,b) => b.weather.rain - a.weather.rain)[0];
     const windy = [...wData].sort((a,b) => b.weather.wind - a.weather.wind)[0];
     function wCard(label, r, detail) {
@@ -945,10 +1027,10 @@ function render() {
       </div>`;
     }
     document.getElementById('weatherExtremes').innerHTML =
-      wCard('🥶 Coldest', byTemp[0], byTemp[0].weather.tmax+'°C max / '+byTemp[0].weather.tmin+'°C min') +
-      wCard('🥵 Hottest', byTemp[byTemp.length-1], byTemp[byTemp.length-1].weather.tmax+'°C') +
-      wCard('🌧 Wettest', rainy, rainy.weather.rain+'mm') +
-      wCard('💨 Windiest', windy, windy.weather.wind+' km/h');
+      wCard('🥶 Coldest start', byTemp[0], byTemp[0].weather.temp + '°C') +
+      wCard('🥵 Warmest start', byTemp[byTemp.length-1], byTemp[byTemp.length-1].weather.temp + '°C') +
+      (rainy.weather.rain > 0 ? wCard('🌧 Wettest run', rainy, rainy.weather.rain + 'mm while running') : '') +
+      wCard('💨 Windiest run', windy, Math.round(windy.weather.wind) + ' km/h, gusting ' + Math.round(windy.weather.gust));
   } else {
     document.getElementById('weatherChart').parentElement.parentElement.style.display = 'none';
     document.getElementById('weatherExtremes').parentElement.style.display = 'none';
